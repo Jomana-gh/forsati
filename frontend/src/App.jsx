@@ -13,7 +13,7 @@ import {
   Mail, MapPin, Star, Zap, Target
 } from "lucide-react";
 
-const API = "http://127.0.0.1:5000";
+const API = "https://forsati-api.onrender.com";
 
 const T = {
   ar: {

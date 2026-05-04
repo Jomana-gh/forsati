@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import "./Chatbot.css";
 
-const API = "http://localhost:5000";
+const API = "https://forsati-api.onrender.com";
 
 const suggestedQuestionsAr = [
   "وين أفضل حي لفتح مطعم في الرياض؟",

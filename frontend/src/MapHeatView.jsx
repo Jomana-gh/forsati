@@ -9,7 +9,7 @@ import {
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-const API = "http://127.0.0.1:5000";
+const API = "https://forsati-api.onrender.com";
 
 // ========== إضافة قاموس الترجمة للأحياء ==========
 const neighborhoodEnglish = {

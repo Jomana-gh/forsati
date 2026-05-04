@@ -10,7 +10,7 @@ import {
   Gift, Glasses, Car, PawPrint,
   Search, Loader2, List, Map, ArrowLeft,
   Bot, Users, Scale, Train, BarChart3,
-  Mail, MapPin, Star, Zap, Target
+  Mail, MapPin, Star, Zap, Target, Menu, X
 } from "lucide-react";
 
 const API = "https://forsati-api.onrender.com";
@@ -62,21 +62,21 @@ const T = {
     statsActivities: "نوع نشاط",
     statsNeighborhoods: "حي في الرياض",
     statsCriteria: "معايير تقييم",
-    veryGood: "مناسب جداً",
-    good: "مناسب",
-    bad: "غير مناسب",
+    veryGood: "مناسب جداً ✅",
+    good: "مناسب 🟡",
+    bad: "غير مناسب ❌",
     mlScore: "توقع النموذج",
     demandScore: "الطلب والكثافة السكانية",
     competitionScore: "مستوى المنافسة",
     nearbyScore: "النشاط التجاري القريب",
     transportScore: "المواصلات العامة",
     marketScore: "قوة السوق",
-features: [
-  { icon: <Bot size={35} />, title: "ذكاء اصطناعي", desc: "نموذج XGBoost مدرّب على بيانات حقيقية من الرياض" },
-  { icon: <BarChart3 size={35} />, title: "تحليل شامل", desc: "6 معايير تقييم تشمل المنافسة والكثافة السكانية والنقل" },
-  { icon: <Zap size={35} />, title: "نتائج فورية", desc: "احصل على تقييمك في ثوانٍ معدودة" },
-  { icon: <Target size={35} />, title: "دقة عالية", desc: "توصيات مبنية على إحصائيات رسمية وبيانات موثوقة" },
-],
+    features: [
+      { icon: <Bot size={35} />, title: "ذكاء اصطناعي", desc: "نموذج XGBoost مدرّب على بيانات حقيقية من الرياض" },
+      { icon: <BarChart3 size={35} />, title: "تحليل شامل", desc: "6 معايير تقييم تشمل المنافسة والكثافة السكانية والنقل" },
+      { icon: <Zap size={35} />, title: "نتائج فورية", desc: "احصل على تقييمك في ثوانٍ معدودة" },
+      { icon: <Target size={35} />, title: "دقة عالية", desc: "توصيات مبنية على إحصائيات رسمية وبيانات موثوقة" },
+    ],
     faqs: [
       { q: "كيف يعمل نظام التقييم؟", a: "نستخدم نموذج ذكاء اصطناعي مدرّب على بيانات حقيقية من أحياء الرياض، يأخذ بعين الاعتبار الكثافة السكانية، المنافسة، وسائل النقل، والنشاط التجاري القريب." },
       { q: "هل البيانات محدّثة؟", a: "نعم، البيانات مبنية على إحصائيات حديثة من مصادر رسمية وتُحدَّث بشكل دوري." },
@@ -137,21 +137,21 @@ features: [
     statsActivities: "Business Types",
     statsNeighborhoods: "Neighborhoods",
     statsCriteria: "Rating Criteria",
-    veryGood: "Highly Suitable",
-    good: "Suitable",
-    bad: "Not Suitable",
+    veryGood: "Highly Suitable ✅",
+    good: "Suitable 🟡",
+    bad: "Not Suitable ❌",
     mlScore: "Model Prediction",
     demandScore: "Population Density",
     competitionScore: "Competition Level",
     nearbyScore: "Nearby Activity",
     transportScore: "Public Transport",
     marketScore: "Market Strength",
-features: [
-  { icon: <Bot size={22} />, title: "Artificial Intelligence", desc: "XGBoost model trained on real Riyadh data" },
-  { icon: <BarChart3 size={22} />, title: "Comprehensive Analysis", desc: "6 rating criteria including competition, density, and transport" },
-  { icon: <Zap size={22} />, title: "Instant Results", desc: "Get your assessment in seconds" },
-  { icon: <Target size={22} />, title: "High Accuracy", desc: "Recommendations based on official statistics and reliable data" },
-],
+    features: [
+      { icon: <Bot size={35} />, title: "Artificial Intelligence", desc: "XGBoost model trained on real Riyadh data" },
+      { icon: <BarChart3 size={35} />, title: "Comprehensive Analysis", desc: "6 rating criteria including competition, density, and transport" },
+      { icon: <Zap size={35} />, title: "Instant Results", desc: "Get your assessment in seconds" },
+      { icon: <Target size={35} />, title: "High Accuracy", desc: "Recommendations based on official statistics and reliable data" },
+    ],
     faqs: [
       { q: "How does the rating system work?", a: "We use an AI model trained on real data from Riyadh neighborhoods, considering population density, competition, transportation, and nearby commercial activity." },
       { q: "Is the data up to date?", a: "Yes, the data is built on recent statistics from official sources and is updated periodically." },
@@ -231,40 +231,46 @@ function getNeighborhoodLabel(name, lang) {
 }
 
 const categoryIcons = {
-  restaurant: <Store size={20} />,
-  cafe: <Coffee size={20} />,
-  supermarket: <ShoppingCart size={20} />,
-  pharmacy: <Pill size={20} />,
-  bakery: <Cake size={20} />,
-  gym: <Dumbbell size={20} />,
-  hotel: <Hotel size={20} />,
-  clothing: <Shirt size={20} />,
-  electronics: <Laptop size={20} />,
-  furniture: <Sofa size={20} />,
-  barber: <Scissors size={20} />,
-  salon: <Sparkles size={20} />,
-  gas_station: <Fuel size={20} />,
-  laundry: <Shirt size={20} />,
-  jewelry: <Gem size={20} />,
-  grocery: <ShoppingCart size={20} />,
-  shoes: <Shirt size={20} />,
-  sports_clothing: <Dumbbell size={20} />,
-  curtains: <Store size={20} />,
-  lighting: <Sparkles size={20} />,
-  sweets: <Cake size={20} />,
-  perfume: <Sparkles size={20} />,
-  spa: <Sparkles size={20} />,
-  auto_repair: <Car size={20} />,
-  toys: <Gift size={20} />,
-  pet_shop: <PawPrint size={20} />,
-  gifts: <Gift size={20} />,
-  eyewear: <Glasses size={20} />
+  restaurant: <Store size={20} />, cafe: <Coffee size={20} />,
+  supermarket: <ShoppingCart size={20} />, pharmacy: <Pill size={20} />,
+  bakery: <Cake size={20} />, gym: <Dumbbell size={20} />,
+  hotel: <Hotel size={20} />, clothing: <Shirt size={20} />,
+  electronics: <Laptop size={20} />, furniture: <Sofa size={20} />,
+  barber: <Scissors size={20} />, salon: <Sparkles size={20} />,
+  gas_station: <Fuel size={20} />, laundry: <Shirt size={20} />,
+  jewelry: <Gem size={20} />, grocery: <ShoppingCart size={20} />,
+  shoes: <Shirt size={20} />, sports_clothing: <Dumbbell size={20} />,
+  curtains: <Store size={20} />, lighting: <Sparkles size={20} />,
+  sweets: <Cake size={20} />, perfume: <Sparkles size={20} />,
+  spa: <Sparkles size={20} />, auto_repair: <Car size={20} />,
+  toys: <Gift size={20} />, pet_shop: <PawPrint size={20} />,
+  gifts: <Gift size={20} />, eyewear: <Glasses size={20} />
 };
 
 function getCategoryLabel(key, lang) {
   return lang === "ar" ? (categoryArabic[key] || key) : (categoryEnglish[key] || key);
 }
 
+// ===== Review Card =====
+function ReviewCard({ r }) {
+  return (
+    <div className="review-card">
+      <div className="review-stars">
+        {[...Array(r.stars)].map((_, i) => <Star key={i} size={14} fill="currentColor" />)}
+      </div>
+      <p className="review-text">"{r.text}"</p>
+      <div className="reviewer">
+        <div className="reviewer-avatar">{r.name[0]}</div>
+        <div>
+          <div className="reviewer-name">{r.name}</div>
+          <div className="reviewer-role">{r.role}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ===== Footer =====
 function Footer({ t }) {
   return (
     <footer className="footer" dir={t.dir}>
@@ -291,24 +297,26 @@ function Footer({ t }) {
   );
 }
 
+// ===== Main App =====
 export default function App() {
   const [lang, setLang] = useState("ar");
   const t = T[lang];
 
-  const [page, setPage] = useState("home");
-  const [categories, setCategories] = useState([]);
-  const [neighborhoods, setNeighborhoods] = useState([]);
+  const [page, setPage]                         = useState("home");
+  const [categories, setCategories]             = useState([]);
+  const [neighborhoods, setNeighborhoods]       = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedNeighborhood, setSelectedNeighborhood] = useState("");
-  const [searchMode, setSearchMode] = useState("rank");
-  const [viewMode, setViewMode] = useState("list");
-  const [results, setResults] = useState([]);
-  const [detailResult, setDetailResult] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [openFaq, setOpenFaq] = useState(null);
-  const [contactForm, setContactForm] = useState({ name: "", email: "", msg: "" });
-  const [contactSent, setContactSent] = useState(false);
+  const [searchMode, setSearchMode]             = useState("rank");
+  const [viewMode, setViewMode]                 = useState("list");
+  const [results, setResults]                   = useState([]);
+  const [detailResult, setDetailResult]         = useState(null);
+  const [loading, setLoading]                   = useState(false);
+  const [error, setError]                       = useState("");
+  const [openFaq, setOpenFaq]                   = useState(null);
+  const [contactForm, setContactForm]           = useState({ name: "", email: "", msg: "" });
+  const [contactSent, setContactSent]           = useState(false);
+  const [menuOpen, setMenuOpen]                 = useState(false);
 
   useEffect(() => {
     axios.get(`${API}/api/categories`).then(r => setCategories(r.data.categories)).catch(() => {});
@@ -317,6 +325,7 @@ export default function App() {
 
   const scrollTo = (id) => {
     setPage("home");
+    setMenuOpen(false);
     setTimeout(() => {
       const el = document.getElementById(id);
       if (el) el.scrollIntoView({ behavior: "smooth" });
@@ -342,43 +351,62 @@ export default function App() {
         setPage("detail");
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
-    } catch (e) { setError(t.errorMsg); }
+    } catch { setError(t.errorMsg); }
     setLoading(false);
   };
 
   const scoreColor = (s) => s >= 70 ? "#16a34a" : s >= 50 ? "#ca8a04" : "#dc2626";
   const scoreLabel = (s) => s >= 70 ? t.veryGood : s >= 50 ? t.good : t.bad;
 
+  // ===== Header =====
   const Header = ({ showBack = false }) => (
-    <header className="header" dir={t.dir}>
-      <div className="header-logo" onClick={() => setPage("home")}>
-        <img src="/forsati_logo.png" alt="Forsati" className="header-logo-img" />
-      </div>
-      {showBack ? (
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <button className="lang-toggle" onClick={() => setLang(lang === "ar" ? "en" : "ar")}>
-            {lang === "ar" ? "EN" : "عر"}
-          </button>
-          <button className="back-btn" onClick={() => setPage(results.length && page === "detail" ? "results" : "home")}>
-            <ArrowLeft size={16} /> {t.back}
-          </button>
+    <>
+      <header className="header" dir={t.dir}>
+        <div className="header-logo" onClick={() => setPage("home")}>
+          <img src="/forsati_logo.png" alt="Forsati" className="header-logo-img" />
         </div>
-      ) : (
-        <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
-          <nav className="nav">
-            <a href="#home-top" onClick={(e) => { e.preventDefault(); scrollTo("home-top"); }}>{t.home}</a>
-            <a href="#about" onClick={(e) => { e.preventDefault(); scrollTo("about"); }}>{t.about}</a>
-            <a href="#faq" onClick={(e) => { e.preventDefault(); scrollTo("faq"); }}>{t.faq}</a>
-            <a href="#contact" onClick={(e) => { e.preventDefault(); scrollTo("contact"); }}>{t.contact}</a>
-          </nav>
-          <button className="lang-toggle" onClick={() => setLang(lang === "ar" ? "en" : "ar")}>
-            {lang === "ar" ? "EN" : "عر"}
-          </button>
+        {showBack ? (
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <button className="lang-toggle" onClick={() => setLang(lang === "ar" ? "en" : "ar")}>
+              {lang === "ar" ? "EN" : "عر"}
+            </button>
+            <button className="back-btn" onClick={() => setPage(results.length && page === "detail" ? "results" : "home")}>
+              <ArrowLeft size={16} /> {t.back}
+            </button>
+          </div>
+        ) : (
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            {/* Nav — ديسكتوب فقط */}
+            <nav className="nav">
+              <a href="#home-top" onClick={e => { e.preventDefault(); scrollTo("home-top"); }}>{t.home}</a>
+              <a href="#about" onClick={e => { e.preventDefault(); scrollTo("about"); }}>{t.about}</a>
+              <a href="#faq" onClick={e => { e.preventDefault(); scrollTo("faq"); }}>{t.faq}</a>
+              <a href="#contact" onClick={e => { e.preventDefault(); scrollTo("contact"); }}>{t.contact}</a>
+            </nav>
+            <button className="lang-toggle" onClick={() => setLang(lang === "ar" ? "en" : "ar")}>
+              {lang === "ar" ? "EN" : "عر"}
+            </button>
+            {/* Hamburger — جوال فقط */}
+            <button className="hamburger" onClick={() => setMenuOpen(o => !o)} aria-label="القائمة">
+              {menuOpen ? <X size={22} /> : <Menu size={22} />}
+            </button>
+          </div>
+        )}
+      </header>
+
+      {/* Mobile Menu */}
+      {!showBack && (
+        <div className={`mobile-menu ${menuOpen ? "open" : ""}`} dir={t.dir}>
+          <a href="#home-top" onClick={e => { e.preventDefault(); scrollTo("home-top"); }}>{t.home}</a>
+          <a href="#about" onClick={e => { e.preventDefault(); scrollTo("about"); }}>{t.about}</a>
+          <a href="#faq" onClick={e => { e.preventDefault(); scrollTo("faq"); }}>{t.faq}</a>
+          <a href="#contact" onClick={e => { e.preventDefault(); scrollTo("contact"); }}>{t.contact}</a>
         </div>
       )}
-    </header>
+    </>
   );
 
+  // ===== Results Page =====
   if (page === "results") return (
     <div className="page" dir={t.dir}>
       <Header showBack />
@@ -388,10 +416,10 @@ export default function App() {
         </h2>
         <div className="view-toggle">
           <button className={viewMode === "list" ? "view-btn active" : "view-btn"} onClick={() => setViewMode("list")}>
-            <List size={16} className="icon-fix" /> {t.list}
+            <List size={16} /> {t.list}
           </button>
           <button className={viewMode === "heatmap" ? "view-btn active" : "view-btn"} onClick={() => setViewMode("heatmap")}>
-            <Map size={16} className="icon-fix" /> {t.heatmap}
+            <Map size={16} /> {t.heatmap}
           </button>
         </div>
         {viewMode === "heatmap" ? (
@@ -420,6 +448,7 @@ export default function App() {
     </div>
   );
 
+  // ===== Detail Page =====
   if (page === "detail" && detailResult) return (
     <div className="page" dir={t.dir}>
       <Header showBack />
@@ -436,23 +465,19 @@ export default function App() {
           <div className="detail-breakdown">
             <h3>{t.ratingDetails}</h3>
             {[
-              { label: t.mlScore, key: "ml_probability", icon: <Bot size={16} /> },
-              { label: t.demandScore, key: "demand_score", icon: <Users size={16} /> },
-              { label: t.competitionScore, key: "competition_score", icon: <Scale size={16} /> },
-              { label: t.nearbyScore, key: "nearby_activity_score", icon: <Store size={16} /> },
-              { label: t.transportScore, key: "transport_score", icon: <Train size={16} /> },
-              { label: t.marketScore, key: "market_strength_score", icon: <BarChart3 size={16} /> },
+              { label: t.mlScore,          key: "ml_probability",       icon: <Bot size={16} /> },
+              { label: t.demandScore,      key: "demand_score",          icon: <Users size={16} /> },
+              { label: t.competitionScore, key: "competition_score",     icon: <Scale size={16} /> },
+              { label: t.nearbyScore,      key: "nearby_activity_score", icon: <Store size={16} /> },
+              { label: t.transportScore,   key: "transport_score",       icon: <Train size={16} /> },
+              { label: t.marketScore,      key: "market_strength_score", icon: <BarChart3 size={16} /> },
             ].map((item) => (
               <div key={item.key} className="breakdown-row">
-                <span className="breakdown-label">
-                  {item.icon} {item.label}
-                </span>
+                <span className="breakdown-label">{item.icon} {item.label}</span>
                 <div className="breakdown-bar-container">
                   <div className="breakdown-bar" style={{ width: `${detailResult.details[item.key]}%`, background: scoreColor(detailResult.details[item.key]) }} />
                 </div>
-                <span className="breakdown-score">
-  {Number(detailResult.details[item.key]).toFixed(1)}%
-</span>
+                <span className="breakdown-score">{Number(detailResult.details[item.key]).toFixed(1)}%</span>
               </div>
             ))}
           </div>
@@ -462,10 +487,12 @@ export default function App() {
     </div>
   );
 
+  // ===== Home Page =====
   return (
     <div className="page" dir={t.dir} id="home-top">
       <Header />
 
+      {/* Hero */}
       <section className="hero" id="hero" style={{ backgroundImage: "url('/forsati_bg.jpg')" }}>
         <div className="hero-bg-overlay" />
         <div className="hero-content">
@@ -486,6 +513,7 @@ export default function App() {
         </div>
       </section>
 
+      {/* Search */}
       <section className="search-section" id="search">
         <h2 className="search-title">{t.searchTitle}</h2>
         <div className="mode-toggle">
@@ -494,9 +522,7 @@ export default function App() {
         </div>
         <div className="search-bar">
           <div className="select-wrapper">
-            <span className="select-icon">
-              <List size={16} className="icon-fix" />
-            </span>
+            <span className="select-icon"><List size={16} /></span>
             <select value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)} className="select-input">
               <option value="">{t.projectType}</option>
               {categories.map(c => <option key={c} value={c}>{getCategoryLabel(c, lang)}</option>)}
@@ -504,9 +530,7 @@ export default function App() {
           </div>
           {searchMode === "evaluate" && (
             <div className="select-wrapper">
-              <span className="select-icon">
-                <MapPin size={16} className="icon-fix" />
-              </span>
+              <span className="select-icon"><MapPin size={16} /></span>
               <select value={selectedNeighborhood} onChange={e => setSelectedNeighborhood(e.target.value)} className="select-input">
                 <option value="">{t.chooseNeighborhood}</option>
                 {neighborhoods.map(n => <option key={n} value={n}>{getNeighborhoodLabel(n, lang)}</option>)}
@@ -514,22 +538,13 @@ export default function App() {
             </div>
           )}
           <button className="search-btn" onClick={handleSearch} disabled={loading}>
-            {loading ? (
-              <>
-                <Loader2 className="spin" size={18} className="icon-fix"  />
-                {t.searching}
-              </>
-            ) : (
-              <>
-                <Search size={18} className="icon-fix"  />
-                {t.search}
-              </>
-            )}
+            {loading ? <><Loader2 className="spin" size={18} /> {t.searching}</> : <><Search size={18} /> {t.search}</>}
           </button>
         </div>
         {error && <p className="error-msg">{error}</p>}
       </section>
 
+      {/* Categories */}
       <section className="categories-section">
         <div className="categories-header"><h2>{t.categories}</h2></div>
         <div className="categories-slider">
@@ -539,15 +554,14 @@ export default function App() {
               setSearchMode("rank");
               document.getElementById("search").scrollIntoView({ behavior: "smooth" });
             }}>
-              <span className="category-icon">
-                {categoryIcons[key] || <Store size={20} />}
-              </span>
+              <span className="category-icon">{categoryIcons[key] || <Store size={20} />}</span>
               <span>{getCategoryLabel(key, lang)}</span>
             </div>
           ))}
         </div>
       </section>
 
+      {/* About */}
       <section className="about-section" id="about">
         <div className="about-inner">
           <div className="section-badge">{t.aboutBadge}</div>
@@ -565,28 +579,23 @@ export default function App() {
         </div>
       </section>
 
+      {/* ===== Reviews ===== */}
       <section className="reviews-section" id="reviews">
         <div className="section-badge">{t.reviewsBadge}</div>
         <h2 className="section-title">{t.reviewsTitle}</h2>
+
+        {/* Grid — ديسكتوب */}
         <div className="reviews-grid">
-          {t.reviews.map((r, i) => (
-            <div key={i} className="review-card">
-              <div className="review-stars">
-                {[...Array(r.stars)].map((_, i) => <Star key={i} size={14} fill="currentColor" />)}
-              </div>
-              <p className="review-text">"{r.text}"</p>
-              <div className="reviewer">
-                <div className="reviewer-avatar">{r.name[0]}</div>
-                <div>
-                  <div className="reviewer-name">{r.name}</div>
-                  <div className="reviewer-role">{r.role}</div>
-                </div>
-              </div>
-            </div>
-          ))}
+          {t.reviews.map((r, i) => <ReviewCard key={i} r={r} />)}
+        </div>
+
+        {/* Slider — جوال */}
+        <div className="reviews-slider">
+          {t.reviews.map((r, i) => <ReviewCard key={i} r={r} />)}
         </div>
       </section>
 
+      {/* FAQ */}
       <section className="faq-section" id="faq">
         <div className="faq-inner">
           <div className="section-badge">{t.faqBadge}</div>
@@ -605,6 +614,7 @@ export default function App() {
         </div>
       </section>
 
+      {/* Contact */}
       <section className="contact-section" id="contact">
         <div className="contact-inner">
           <div className="section-badge">{t.contactBadge}</div>
@@ -622,12 +632,8 @@ export default function App() {
             </div>
           )}
           <div className="contact-info">
-            <div className="contact-info-item">
-              <Mail size={16} /> <span>forsati@example.com</span>
-            </div>
-            <div className="contact-info-item">
-              <MapPin size={16} /> <span>{lang === "ar" ? "الرياض، المملكة العربية السعودية" : "Riyadh, Saudi Arabia"}</span>
-            </div>
+            <div className="contact-info-item"><Mail size={16} /> <span>forsati@example.com</span></div>
+            <div className="contact-info-item"><MapPin size={16} /> <span>{lang === "ar" ? "الرياض، المملكة العربية السعودية" : "Riyadh, Saudi Arabia"}</span></div>
           </div>
         </div>
       </section>

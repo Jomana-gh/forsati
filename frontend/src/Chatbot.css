@@ -1,0 +1,323 @@
+/* ===== Chatbot فرصتي ===== */
+
+/* زر الفتح العائم */
+.chat-fab {
+  position: fixed;
+  bottom: 28px;
+  left: 28px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #1a7a3a;
+  color: white;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(26,122,58,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.chat-fab:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 24px rgba(26,122,58,0.5);
+}
+
+/* نافذة الـ Chat */
+.chat-window {
+  position: fixed;
+  bottom: 96px;
+  left: 28px;
+  width: 370px;
+  max-height: 580px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+  display: flex;
+  flex-direction: column;
+  z-index: 999;
+  overflow: hidden;
+  animation: slideUp 0.25s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Header */
+.chat-header {
+  background: linear-gradient(135deg, #1a7a3a, #145e2c);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chat-header-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.chat-avatar {
+  font-size: 26px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-name {
+  color: white;
+  font-weight: 700;
+  font-size: 15px;
+  font-family: 'Tajawal', sans-serif;
+}
+
+.chat-status {
+  color: rgba(255,255,255,0.75);
+  font-size: 12px;
+  font-family: 'Tajawal', sans-serif;
+}
+
+.chat-close {
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+.chat-close:hover { background: rgba(255,255,255,0.25); }
+
+/* Messages area */
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #f9fafb;
+}
+
+.chat-bubble-wrap {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+.chat-bubble-wrap.user { flex-direction: row-reverse; }
+
+.bubble-avatar {
+  font-size: 20px;
+  flex-shrink: 0;
+  margin-bottom: 2px;
+}
+
+.chat-bubble {
+  max-width: 80%;
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.chat-bubble.bot {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-bottom-right-radius: 4px;
+  color: #1a1a1a;
+}
+
+.chat-bubble.user {
+  background: #1a7a3a;
+  color: white;
+  border-bottom-left-radius: 4px;
+}
+
+.chat-bubble.error {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #dc2626;
+}
+
+/* Sources */
+.chat-sources {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.sources-label {
+  font-size: 12px;
+  color: #6b7280;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.sources-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.source-tag {
+  background: #e8f5ee;
+  color: #1a7a3a;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 99px;
+  font-family: 'Tajawal', sans-serif;
+}
+
+/* Loading dots */
+.loading-bubble {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  padding: 14px 18px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #1a7a3a;
+  animation: bounce 1.2s infinite;
+}
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-6px); opacity: 1; }
+}
+
+/* Suggested questions */
+.chat-suggestions {
+  padding: 8px 12px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+}
+
+.suggestion-btn {
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 13px;
+  color: #1a7a3a;
+  cursor: pointer;
+  text-align: right;
+  transition: all 0.15s;
+}
+.suggestion-btn:hover {
+  background: #e8f5ee;
+  border-color: #1a7a3a;
+}
+
+/* Input area */
+.chat-input-area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid #e5e7eb;
+  background: white;
+}
+
+.chat-input {
+  flex: 1;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+  direction: rtl;
+}
+.chat-input:focus { border-color: #1a7a3a; }
+.chat-input:disabled { background: #f3f4f6; }
+
+.chat-send {
+  background: #1a7a3a;
+  color: white;
+  border: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.2s, transform 0.15s;
+}
+.chat-send:hover:not(:disabled) {
+  background: #145e2c;
+  transform: scale(1.05);
+}
+.chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Mobile */
+@media (max-width: 420px) {
+  .chat-window {
+    left: 10px;
+    right: 10px;
+    width: auto;
+    bottom: 84px;
+  }
+  .chat-fab { left: 16px; bottom: 20px; }
+}
+
+/* ===== إصلاح محاذاة أيقونة المحادثة (الزر الرئيسي) ===== */
+.chat-fab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1;
+  padding: 0;
+}
+
+.chat-fab svg {
+  display: block;
+  margin: 0 auto;
+  position: relative;
+  top: 0;
+  left: 0;
+  transform: none;
+}
+
+/* ===== إصلاح زر الإكس (X) اللي يغلق النافذة ===== */
+.chat-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1;
+  padding: 0;
+}
+
+.chat-close svg {
+  display: block;
+  margin: 0 auto;
+}

@@ -2,10 +2,6 @@
 # مشروع فرصتي - Flask API
 # ============================================================
 
-# pip install flask flask-cors pandas numpy xgboost scikit-learn
-# cd backend
-# python app.py
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from sklearn.preprocessing import LabelEncoder
@@ -19,7 +15,6 @@ app = Flask(__name__)
 CORS(app)
 
 
-# ===== تحويل float32 لـ float عادي =====
 def convert_to_serializable(obj):
     if isinstance(obj, dict):
         return {k: convert_to_serializable(v) for k, v in obj.items()}
@@ -32,7 +27,6 @@ def convert_to_serializable(obj):
     return obj
 
 
-# ===== تحميل النموذج والبيانات =====
 print('Loading model...')
 with open('forsati_model_v2.pkl', 'rb') as f:
     saved = pickle.load(f)
@@ -105,11 +99,74 @@ centroid_dict = {
     "ظهرة لبن": (24.628917, 46.543636),
 }
 
-# حساب category_encoded
+# ===== خريطة الأسماء الإنجليزية للأحياء =====
+neighborhood_en_to_ar = {
+    "al olaya": "العليا", "al-olaya": "العليا", "olaya": "العليا",
+    "al malaz": "الملز", "al-malaz": "الملز", "malaz": "الملز",
+    "al aqiq": "العقيق", "al-aqiq": "العقيق", "aqiq": "العقيق",
+    "al sulaimaniyah": "السليمانية", "sulaimaniyah": "السليمانية", "sulamaniyah": "السليمانية",
+    "al narjis": "النرجس", "narjis": "النرجس",
+    "al yasmin": "الياسمين", "yasmin": "الياسمين",
+    "al ghadir": "الغدير", "ghadir": "الغدير",
+    "hittin": "حطين", "al hittin": "حطين",
+    "al muruj": "المروج", "muruj": "المروج",
+    "al sahafa": "الصحافة", "sahafa": "الصحافة",
+    "qurtubah": "قرطبة", "al qurtubah": "قرطبة",
+    "ghirnatah": "غرناطة", "al ghirnatah": "غرناطة",
+    "al rabie": "الربيع", "rabie": "الربيع",
+    "al rawabi": "الروابي", "rawabi": "الروابي",
+    "dhahrat laban": "ظهرة لبن", "laban": "ظهرة لبن",
+    "al nafil": "النفل", "nafil": "النفل",
+    "al dar al baida": "الدار البيضاء", "dar al baida": "الدار البيضاء",
+    "al rawdah": "الروضة", "rawdah": "الروضة",
+    "al munsiyah": "المونسية", "munsiyah": "المونسية",
+    "al nasim al sharqi": "النسيم الشرقي",
+    "al nasim al gharbi": "النسيم الغربي", "nasim": "النسيم الشرقي",
+    "al yarmuk": "اليرموك", "yarmuk": "اليرموك",
+    "al yamamah": "اليمامة", "yamamah": "اليمامة",
+    "al wazarat": "الوزارات", "wazarat": "الوزارات",
+    "al wisham": "الوشام", "wisham": "الوشام",
+    "al aziziyah": "العزيزية", "aziziyah": "العزيزية",
+    "al mansurah": "المنصورة", "mansurah": "المنصورة",
+    "al malqa": "الملقا", "malqa": "الملقا",
+    "al muadhar": "المعذر", "muadhar": "المعذر",
+    "al nahdah": "النهضة", "nahdah": "النهضة",
+    "al nuzha": "النزهة", "nuzha": "النزهة",
+    "al jaradiyah": "الجرادية", "jaradiyah": "الجرادية",
+    "al duraihimiyah": "الدريهمية", "duraihimiyah": "الدريهمية",
+    "al shumaisi": "الشميسي", "shumaisi": "الشميسي",
+    "al hamra": "الحمراء", "hamra": "الحمراء",
+    "al khalij": "الخليج", "khalij": "الخليج",
+    "al saadah": "السعادة", "saadah": "السعادة",
+    "al salam": "السلام", "salam": "السلام",
+    "al sali": "السلي", "sali": "السلي",
+    "al suwaidi": "السويدي", "suwaidi": "السويدي",
+    "al shifa": "الشفا", "shifa": "الشفا",
+    "al salhiyah": "الصالحية", "salhiyah": "الصالحية",
+    "al safa": "الصفا", "safa": "الصفا",
+    "al dubbat": "الضباط", "dubbat": "الضباط",
+    "al arid": "العارض", "arid": "العارض",
+    "al futah": "الفوطة", "futah": "الفوطة",
+    "al fayha": "الفيحاء", "fayha": "الفيحاء",
+    "al quds": "القدس", "quds": "القدس",
+    "al murabbaa": "المربع", "murabbaa": "المربع",
+    "al marqab": "المرقب", "marqab": "المرقب",
+    "al marwah": "المروة", "marwah": "المروة",
+    "al hazm": "الحزم", "hazm": "الحزم",
+    "badr": "بدر",
+    "sultana": "سلطانة",
+    "shubra": "شبرا",
+    "taybah": "طيبة", "taiba": "طيبة",
+    "ukaz": "عكاظ",
+    "ulaisha": "عليشة",
+    "manfuhah": "منفوحة",
+    "namar": "نمار",
+    "salihiyah": "الصالحية",
+}
+
 le = LabelEncoder()
 df['category_encoded'] = le.fit_transform(df['category_en'])
 
-# إعادة بناء One-Hot للمنطقة
 region_map = {0: 'Central', 1: 'East', 2: 'North', 3: 'South', 4: 'West'}
 df['region'] = df['region_encoded'].map(region_map)
 region_dummies = pd.get_dummies(df['region'], prefix='region')
@@ -117,8 +174,6 @@ df = pd.concat([df, region_dummies], axis=1)
 
 print('Model loaded successfully!')
 
-
-# ===== دوال مساعدة =====
 
 def normalize_value(value, min_value, max_value):
     if max_value == min_value:
@@ -164,25 +219,21 @@ def calculate_score(category_name, neighborhood_name):
         df['population_density'].min(),
         df['population_density'].max()
     )
-
     nearby_activity_score = normalize_value(
         values['nearby_all_businesses'],
         df['nearby_all_businesses'].min(),
         df['nearby_all_businesses'].max()
     )
-
     transport_score = normalize_value(
         values['metro'] + values['bus'] + values['public_station'],
         (df['metro'] + df['bus'] + df['public_station']).min(),
         (df['metro'] + df['bus'] + df['public_station']).max()
     )
-
     market_strength_score = normalize_value(
         values['business_licenses'],
         df['business_licenses'].min(),
         df['business_licenses'].max()
     )
-
     competition = values['competition_ratio']
     ideal_competition = df['competition_ratio'].median()
     if ideal_competition == 0:
@@ -199,15 +250,9 @@ def calculate_score(category_name, neighborhood_name):
         0.10 * transport_score +
         0.05 * market_strength_score
     )
-
     final_score = round(final_score * 100, 2)
 
-    if final_score >= 70:
-        label = 'مناسب جداً'
-    elif final_score >= 50:
-        label = 'مناسب'
-    else:
-        label = 'غير مناسب'
+    label = 'مناسب جداً' if final_score >= 70 else 'مناسب' if final_score >= 50 else 'غير مناسب'
 
     return {
         'neighborhood': neighborhood_name,
@@ -231,18 +276,13 @@ def calculate_score(category_name, neighborhood_name):
 def home():
     return jsonify({'message': 'Forsati API is running!'})
 
-
 @app.route('/api/neighborhoods', methods=['GET'])
 def get_neighborhoods():
-    neighborhoods = sorted(df['neighborhood'].unique().tolist())
-    return jsonify({'neighborhoods': neighborhoods})
-
+    return jsonify({'neighborhoods': sorted(df['neighborhood'].unique().tolist())})
 
 @app.route('/api/categories', methods=['GET'])
 def get_categories():
-    categories = sorted(df['category_en'].unique().tolist())
-    return jsonify({'categories': categories})
-
+    return jsonify({'categories': sorted(df['category_en'].unique().tolist())})
 
 @app.route('/api/evaluate', methods=['POST'])
 def evaluate():
@@ -252,20 +292,16 @@ def evaluate():
 
     if not category or not neighborhood:
         return jsonify({'error': 'category and neighborhood are required'}), 400
-
     if category not in df['category_en'].unique():
         return jsonify({'error': 'Category not found'}), 404
-
     if neighborhood not in df['neighborhood'].unique():
         return jsonify({'error': 'Neighborhood not found'}), 404
 
     result = calculate_score(category, neighborhood)
-
     if result is None:
         return jsonify({'error': 'Could not calculate score'}), 500
 
     return jsonify(convert_to_serializable(result))
-
 
 @app.route('/api/rank', methods=['POST'])
 def rank():
@@ -275,37 +311,26 @@ def rank():
 
     if not category:
         return jsonify({'error': 'category is required'}), 400
-
     if category not in df['category_en'].unique():
         return jsonify({'error': 'Category not found'}), 404
 
     neighborhoods = sorted(df['neighborhood'].unique())
     results = []
-
     for neighborhood in neighborhoods:
         score = calculate_score(category, neighborhood)
         if score:
             results.append(score)
 
     results = sorted(results, key=lambda x: x['final_score'], reverse=True)
+    return jsonify(convert_to_serializable({'category': category, 'rankings': results[:top_n]}))
 
-    return jsonify(convert_to_serializable({
-        'category': category,
-        'rankings': results[:top_n]
-    }))
-
-
-# ===== /api/map يرجع JSON بدل HTML =====
-# React يرسمه مباشرة بدون Leaflet أو folium
 @app.route('/api/map/<category>', methods=['GET'])
 def get_map(category):
     if category not in df['category_en'].unique():
         return jsonify({'error': 'Category not found'}), 404
 
-    neighborhoods = sorted(df['neighborhood'].unique())
     rankings = []
-
-    for n in neighborhoods:
+    for n in sorted(df['neighborhood'].unique()):
         s = calculate_score(category, n)
         if s:
             coords = centroid_dict.get(n)
@@ -319,10 +344,213 @@ def get_map(category):
                 })
 
     rankings = sorted(rankings, key=lambda x: x['final_score'], reverse=True)
-
     return jsonify(convert_to_serializable({'category': category, 'rankings': rankings}))
 
 
-# ===== تشغيل السيرفر =====
+# ===== Chatbot =====
+
+categoryArabic = {
+    "restaurant": "مطعم", "cafe": "كافيه", "supermarket": "سوبرماركت",
+    "pharmacy": "صيدلية", "bakery": "مخبز", "gym": "نادي رياضي",
+    "hotel": "فندق", "clothing": "محل ملابس", "electronics": "محل إلكترونيات",
+    "furniture": "محل أثاث", "barber": "صالون حلاقة رجالي", "salon": "صالون نسائي",
+    "gas_station": "محطة وقود", "laundry": "مغسلة ملابس", "jewelry": "محل مجوهرات",
+    "grocery": "بقالة", "shoes": "محل أحذية", "sports_clothing": "محل ملابس رياضية",
+    "curtains": "محل ستائر وسجاد", "lighting": "محل إضاءة", "sweets": "محل حلويات",
+    "perfume": "محل عطور", "spa": "سبا", "auto_repair": "ورشة سيارات",
+    "toys": "محل ألعاب أطفال", "pet_shop": "محل حيوانات أليفة",
+    "gifts": "محل هدايا وزهور", "eyewear": "محل نظارات"
+}
+
+categoryKeywords = {
+    "restaurant": ["مطعم", "اكل", "طعام", "أكل", "وجبة", "مأكولات", "restaurant", "food", "meal", "dining", "eat"],
+    "cafe": ["كافيه", "كافيهات", "قهوة", "كوفي", "cafe", "coffee", "coffee shop", "coffeehouse"],
+    "pharmacy": ["صيدلية", "دواء", "أدوية", "pharmacy", "drugstore", "medicine", "chemist"],
+    "supermarket": ["سوبرماركت", "هايبر", "supermarket", "grocery store", "market", "hypermarket"],
+    "gym": ["جيم", "نادي رياضي", "رياضة", "gym", "fitness", "sports club", "workout"],
+    "grocery": ["بقالة", "دكان", "grocery", "corner shop", "groceries"],
+    "clothing": ["ملابس", "موضة", "عباية", "clothing", "fashion", "clothes", "apparel", "wear"],
+    "salon": ["صالون نسائي", "تجميل", "كوافير", "salon", "beauty", "hair salon", "beauty salon"],
+    "barber": ["حلاقة", "حلاق", "صالون رجالي", "barber", "barbershop", "haircut"],
+    "gas_station": ["وقود", "محطة وقود", "بنزين", "gas station", "fuel", "petrol", "filling station"],
+    "sweets": ["حلويات", "حلا", "كيك", "sweets", "dessert", "pastry", "candy"],
+    "electronics": ["الكترونيات", "جوالات", "أجهزة", "electronics", "phones", "gadgets", "appliances"],
+    "perfume": ["عطور", "عطر", "perfume", "fragrance", "scent"],
+    "spa": ["سبا", "مساج", "spa", "massage", "wellness"],
+    "bakery": ["مخبز", "خبز", "bakery", "bread", "baker"],
+    "jewelry": ["مجوهرات", "ذهب", "jewelry", "jewellery", "gold", "diamonds"],
+    "shoes": ["أحذية", "حذاء", "shoes", "footwear", "sneakers"],
+    "furniture": ["أثاث", "اثاث", "furniture", "home decor", "furnishings"],
+    "hotel": ["فندق", "فنادق", "hotel", "lodging", "accommodation", "inn"],
+    "toys": ["ألعاب", "العاب اطفال", "toys", "children toys", "play"],
+    "pet_shop": ["حيوانات", "بيت الحيوان", "pet shop", "pet store", "animals", "pets"],
+    "gifts": ["هدايا", "زهور", "gifts", "flowers", "presents", "gift shop"],
+    "eyewear": ["نظارات", "عيون", "eyewear", "glasses", "optician", "spectacles"],
+    "laundry": ["مغسلة", "غسيل", "laundry", "dry cleaning", "wash"],
+    "curtains": ["ستائر", "سجاد", "curtains", "carpets", "blinds", "rugs"],
+    "lighting": ["إضاءة", "اضاءة", "lighting", "lights", "lamps"],
+    "sports_clothing": ["ملابس رياضية", "رياضي", "sports clothing", "activewear", "sportswear", "athletic"],
+    "auto_repair": ["ورشة", "سيارات", "صيانة سيارات", "auto repair", "car repair", "mechanic", "garage"],
+}
+
+def detect_category(text):
+    text_lower = text.lower()
+    for cat, keywords in categoryKeywords.items():
+        for kw in keywords:
+            if kw.lower() in text_lower:
+                return cat
+    return None
+
+def detect_neighborhood(text):
+    # 1. بحث مباشر بالعربي
+    for n in df['neighborhood'].unique():
+        if n in text:
+            return n
+    # 2. بحث بالإنجليزي من الـ mapping
+    text_lower = text.lower()
+    for en_name, ar_name in neighborhood_en_to_ar.items():
+        if en_name in text_lower:
+            return ar_name
+    return None
+
+@app.route('/api/chat', methods=['POST'])
+def chatbot():
+    data = request.json
+    question = data.get('question', '').strip()
+    lang = data.get('lang', 'ar')
+    q_lower = question.lower()
+
+    if not question:
+        return jsonify({"answer": "What would you like to know? 😊" if lang == 'en' else "وش تبي تعرف؟ 😊"})
+
+    # ===== دالة تحويل اسم الحي للإنجليزي =====
+    # معكوس neighborhood_en_to_ar — نأخذ أول إنجليزي لكل عربي
+    ar_to_en = {}
+    for en, ar in neighborhood_en_to_ar.items():
+        if ar not in ar_to_en:
+            ar_to_en[ar] = en.title()
+
+    def display_name(ar_name):
+        return ar_to_en.get(ar_name, ar_name) if lang == 'en' else ar_name
+
+    category     = detect_category(question)
+    neighborhood = detect_neighborhood(question)
+
+    # ===== 1. كثافة سكانية — يجي أول قبل greeting =====
+    density_ar = ["كثافة", "سكان", "عدد السكان"]
+    density_en = ["density", "population", "crowded", "most populated", "highest density"]
+    if any(w in question for w in density_ar) or any(w in q_lower for w in density_en):
+        top_nb = df.groupby('neighborhood')['population_density'].mean().idxmax()
+        if lang == 'en':
+            return jsonify({"answer": f"The neighborhood with the highest population density in Riyadh is **{display_name(top_nb)}** 👥"})
+        return jsonify({"answer": f"أعلى حي بالكثافة السكانية في الرياض هو **{top_nb}** 👥"})
+
+    # ===== 2. حي محدد + فئة محددة =====
+    if category and neighborhood:
+        result = calculate_score(category, neighborhood)
+        if result:
+            score  = result['final_score']
+            cat_ar = categoryArabic.get(category, category)
+            d      = result['details']
+            nb_display = display_name(neighborhood)
+
+            if lang == 'en':
+                if score >= 70:
+                    verdict = "Very Suitable ✅"
+                    intro   = f"{nb_display} is an excellent choice for a {category}! 🎯"
+                elif score >= 50:
+                    verdict = "Suitable 🟡"
+                    intro   = f"{nb_display} has potential for a {category}, but needs more study."
+                else:
+                    verdict = "Not Suitable ❌"
+                    intro   = f"{nb_display} is not ideal for a {category}. Consider other neighborhoods."
+
+                answer  = f"{intro}\n\n"
+                answer += f"📊 Overall Score: {score}/100 — {verdict}\n\n"
+                answer += f"Score Breakdown:\n"
+                answer += f"🤖 Model Prediction: {d['ml_probability']}%\n"
+                answer += f"👥 Demand & Density: {d['demand_score']}%\n"
+                answer += f"⚖️ Competition Level: {d['competition_score']}%\n"
+                answer += f"🏪 Nearby Activity: {d['nearby_activity_score']}%\n"
+                answer += f"🚇 Transportation: {d['transport_score']}%\n"
+                answer += f"📈 Market Strength: {d['market_strength_score']}%"
+            else:
+                if score >= 70:
+                    verdict = "مناسب جداً ✅"
+                    intro   = f"حي {neighborhood} خيار ممتاز لـ{cat_ar}! 🎯"
+                elif score >= 50:
+                    verdict = "مناسب 🟡"
+                    intro   = f"حي {neighborhood} فيه إمكانية لـ{cat_ar}، بس تحتاج دراسة أكثر."
+                else:
+                    verdict = "غير مناسب ❌"
+                    intro   = f"حي {neighborhood} مو مثالي لـ{cat_ar}، أنصحك تشوف أحياء ثانية."
+
+                answer  = f"{intro}\n\n"
+                answer += f"📊 الدرجة الكلية: {score}/100 — {verdict}\n\n"
+                answer += f"تفاصيل التقييم:\n"
+                answer += f"🤖 توقع النموذج: {d['ml_probability']}%\n"
+                answer += f"👥 الطلب والكثافة: {d['demand_score']}%\n"
+                answer += f"⚖️ مستوى المنافسة: {d['competition_score']}%\n"
+                answer += f"🏪 النشاط التجاري القريب: {d['nearby_activity_score']}%\n"
+                answer += f"🚇 المواصلات: {d['transport_score']}%\n"
+                answer += f"📈 قوة السوق: {d['market_strength_score']}%"
+
+            return jsonify({"answer": answer, "sources": [nb_display]})
+
+    # ===== 3. فئة فقط → أفضل 3 أحياء =====
+    if category:
+        cat_ar  = categoryArabic.get(category, category)
+        results = []
+        for n in sorted(df['neighborhood'].unique()):
+            s = calculate_score(category, n)
+            if s:
+                results.append(s)
+        results = sorted(results, key=lambda x: x['final_score'], reverse=True)[:3]
+
+        if results:
+            medals  = ["🥇", "🥈", "🥉"]
+            sources = [display_name(r['neighborhood']) for r in results]
+
+            if lang == 'en':
+                answer = f"Best neighborhoods for a {category} in Riyadh 🏆\n\n"
+                for i, r in enumerate(results):
+                    d = r['details']
+                    answer += f"{medals[i]} {display_name(r['neighborhood'])} — {r['final_score']}/100\n"
+                    answer += f"   👥 Demand: {d['demand_score']}% | ⚖️ Competition: {d['competition_score']}% | 🚇 Transit: {d['transport_score']}%\n\n"
+                answer += "You can view more details through the search on the website! 😊"
+            else:
+                answer = f"أفضل الأحياء لـ{cat_ar} في الرياض 🏆\n\n"
+                for i, r in enumerate(results):
+                    d = r['details']
+                    answer += f"{medals[i]} {r['neighborhood']} — {r['final_score']}/100\n"
+                    answer += f"   👥 الطلب: {d['demand_score']}% | ⚖️ المنافسة: {d['competition_score']}% | 🚇 النقل: {d['transport_score']}%\n\n"
+                answer += "تقدري تشوفين تفاصيل أكثر من خلال البحث في الموقع! 😊"
+
+            return jsonify({"answer": answer, "sources": sources})
+
+    # ===== 4. تحيات — بعد كل الـ checks المفيدة =====
+    greeting_ar = ["مرحبا", "هلا", "السلام", "اهلا", "أهلا"]
+    # نبحث عن كلمة مستقلة لتجنب false positive مثل "highest"
+    greeting_en = ["hello", "hey", "greetings", "good morning", "good evening"]
+    q_words = set(q_lower.split())
+    if any(w in question for w in greeting_ar) or any(w in q_words for w in greeting_en):
+        if lang == 'en':
+            return jsonify({"answer": "Hello! I'm the Forsati assistant 🤖\nAsk me about any business type and I'll help you find the best neighborhood in Riyadh!"})
+        return jsonify({"answer": "مرحباً! أنا مساعد فرصتي 🤖\nاسأليني عن أي نشاط تجاري وأساعدك تختاري أفضل حي في الرياض!"})
+
+    # ===== 5. شكر =====
+    thanks_ar = ["شكرا", "شكراً", ]
+    thanks_en = ["thanks", "thank you", "appreciate"]
+    if any(w in question for w in thanks_ar) or any(w in q_lower for w in thanks_en):
+        if lang == 'en':
+            return jsonify({"answer": "You're welcome! Anything else I can help with? 😊"})
+        return jsonify({"answer": "العفو! أي خدمة ثانية؟ 😊"})
+
+    # ===== ما فهم السؤال =====
+    if lang == 'en':
+        return jsonify({"answer": "I didn't quite understand your question 😅\nTry asking:\n• What's the best neighborhood for a restaurant?\n• Is Al-Malaz suitable for a cafe?\n• Which neighborhood has the highest population density?"})
+    return jsonify({"answer": "ما فهمت سؤالك كويس 😅\nجربي تسأليني مثلاً:\n• وين أفضل حي لمطعم؟\n• هل حي الملز مناسب لكافيه؟\n• أي حي فيه أعلى كثافة سكانية؟"})
+
+
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=False, host='0.0.0.0', port=5000)

@@ -940,3 +940,183 @@ body {
   min-width: 140px;
   flex-shrink: 0;
 }
+
+/* ===== تنسيق زر تغيير اللغة ===== */
+.lang-toggle {
+  background: linear-gradient(135deg, var(--green-light) 0%, #ffffff 100%);
+  border: 2px solid var(--green);
+  border-radius: 40px;
+  padding: 8px 20px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--green);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(26, 122, 58, 0.15);
+  backdrop-filter: blur(4px);
+}
+
+/* تأثير hover */
+.lang-toggle:hover {
+  background: var(--green);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(26, 122, 58, 0.25);
+  border-color: var(--green-dark);
+}
+
+/* تأثير النقر (active) */
+.lang-toggle:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 8px rgba(26, 122, 58, 0.15);
+}
+
+/* تأثير التركيز للوصولية */
+.lang-toggle:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(26, 122, 58, 0.3);
+  border-color: var(--green-dark);
+}
+
+/* تنسيق للشاشات الصغيرة */
+@media (max-width: 768px) {
+  .lang-toggle {
+    padding: 6px 16px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+}
+
+/* تنسيق خاص للهيدر عندما يكون الزر بجانب أزرار أخرى */
+.header .lang-toggle {
+  margin-right: 8px;
+}
+
+/* تنسيق للزر في وضع "showBack" */
+.back-btn + .lang-toggle,
+.lang-toggle + .back-btn {
+  margin-left: 8px;
+}
+
+/* تأثير نبض خفيف عند التبديل (اختياري) */
+.lang-toggle:active {
+  animation: langPulse 0.2s ease-in-out;
+}
+
+@keyframes langPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* تنسيق للغة العربية عندما يكون النص من اليمين لليسار */
+[dir="rtl"] .lang-toggle {
+  letter-spacing: 0;
+}
+
+/* إضافة تأثير تدرج خلفية متحرك (اختياري - يضيف حيوية) */
+.lang-toggle {
+  background-size: 200% auto;
+  background-image: linear-gradient(135deg, var(--green-light) 0%, #ffffff 50%, var(--green-light) 100%);
+  transition: background-position 0.3s ease;
+}
+
+.lang-toggle:hover {
+  background-position: right center;
+}
+/* Rank badge inline (under neighborhood name) */
+.rank-badge-inline {
+  display: inline-block;
+  background: var(--green-light);
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 99px;
+  margin-top: 4px;
+}
+
+/* Remove old side rank badge styles if causing issues */
+.result-card .rank-badge {
+  display: none;
+}
+
+.category-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: #f3f4f6;
+  color: #16a34a;
+  margin-bottom: 10px;
+  transition: all 0.3s ease;
+}
+
+.category-card {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.category-card:hover {
+  transform: translateY(-5px);
+}
+
+.category-card:hover .category-icon {
+  background: #16a34a;
+  color: white;
+  transform: scale(1.1);
+}
+
+.category-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: #f3f4f6;
+  color: #16a34a;
+  margin-bottom: 10px;
+  transition: all 0.3s ease;
+}
+
+.category-card:hover .category-icon {
+  background: #16a34a;
+  color: white;
+  transform: scale(1.1);
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+button svg {
+  margin-inline-end: 6px;
+}
+
+svg.icon-fix {
+  vertical-align: middle;
+  margin-top: -2px;
+  display: inline-block;
+}

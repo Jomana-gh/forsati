@@ -439,144 +439,264 @@ def detect_neighborhood(text):
             return ar_name
     return None
 
-@app.route('/api/chat', methods=['POST'])
-def chatbot():
+
+@app.route("/api/chat", methods=["POST"])
+def chat():
     data = request.json
-    question = data.get('question', '').strip()
-    lang = data.get('lang', 'ar')
-    q_lower = question.lower()
+    question = data.get("question", "").strip()
+    lang = data.get("lang", "ar")
+    q = question.lower()
+    answer = ""
+    sources = []
 
-    if not question:
-        return jsonify({"answer": "What would you like to know? 😊" if lang == 'en' else "وش تبي تعرف؟ 😊"})
+    category = detect_category(question)
 
-    # ===== دالة تحويل اسم الحي للإنجليزي =====
-    # معكوس neighborhood_en_to_ar — نأخذ أول إنجليزي لكل عربي
-    ar_to_en = {}
-    for en, ar in neighborhood_en_to_ar.items():
-        if ar not in ar_to_en:
-            ar_to_en[ar] = en.title()
+    # استخراج كل الأحياء المذكورة في السؤال (للمقارنة)
+    all_neighborhoods = []
+    for n in df['neighborhood'].unique():
+        if n in question:
+            all_neighborhoods.append(n)
+    # بحث بالإنجليزي كمان
+    for en_name, ar_name in neighborhood_en_to_ar.items():
+        if en_name in q and ar_name not in all_neighborhoods:
+            all_neighborhoods.append(ar_name)
 
-    def display_name(ar_name):
-        return ar_to_en.get(ar_name, ar_name) if lang == 'en' else ar_name
+    neighborhood = all_neighborhoods[0] if all_neighborhoods else None
 
-    category     = detect_category(question)
-    neighborhood = detect_neighborhood(question)
+    # ============================================
+    # مقارنة بين حيين
+    # ============================================
+    if len(all_neighborhoods) >= 2 and any(w in q for w in ["مقارنة", "قارن", "أفضل من", "احسن من", "versus", "vs", "compare", "or", "او", "أو"]):
+        n1 = all_neighborhoods[0]
+        n2 = all_neighborhoods[1]
+        cat = category or "restaurant"
+        cat_ar = categoryArabic.get(cat, cat)
 
-    # ===== 1. كثافة سكانية — يجي أول قبل greeting =====
-    density_ar = ["كثافة", "سكان", "عدد السكان"]
-    density_en = ["density", "population", "crowded", "most populated", "highest density"]
-    if any(w in question for w in density_ar) or any(w in q_lower for w in density_en):
-        top_nb = df.groupby('neighborhood')['population_density'].mean().idxmax()
-        if lang == 'en':
-            return jsonify({"answer": f"The neighborhood with the highest population density in Riyadh is **{display_name(top_nb)}** 👥"})
-        return jsonify({"answer": f"أعلى حي بالكثافة السكانية في الرياض هو **{top_nb}** 👥"})
+        r1 = calculate_score(cat, n1)
+        r2 = calculate_score(cat, n2)
 
-    # ===== 2. حي محدد + فئة محددة =====
-    if category and neighborhood:
+        if r1 and r2:
+            winner = n1 if r1['final_score'] > r2['final_score'] else n2
+            d1 = r1['details']
+            d2 = r2['details']
+
+            if lang == "ar":
+                answer = f"مقارنة بين {n1} و {n2} لـ{cat_ar} ⚖️\n\n"
+                answer += f"{'حي':<15} {'الدرجة':>8} {'الطلب':>8} {'المنافسة':>10} {'النقل':>8}\n"
+                answer += f"{'─'*50}\n"
+                answer += f"{n1:<15} {r1['final_score']:>8} {d1['demand_score']:>8}% {d1['competition_score']:>10}% {d1['transport_score']:>8}%\n"
+                answer += f"{n2:<15} {r2['final_score']:>8} {d2['demand_score']:>8}% {d2['competition_score']:>10}% {d2['transport_score']:>8}%\n\n"
+                answer += f"🏆 الفائز: حي {winner}!"
+            else:
+                answer = f"Comparing {n1} vs {n2} for {cat} ⚖️\n\n"
+                answer += f"{'Neighborhood':<15} {'Score':>6} {'Demand':>8} {'Compete':>9} {'Transit':>8}\n"
+                answer += f"{'─'*50}\n"
+                answer += f"{n1:<15} {r1['final_score']:>6} {d1['demand_score']:>8}% {d1['competition_score']:>9}% {d1['transport_score']:>8}%\n"
+                answer += f"{n2:<15} {r2['final_score']:>6} {d2['demand_score']:>8}% {d2['competition_score']:>9}% {d2['transport_score']:>8}%\n\n"
+                answer += f"🏆 Winner: {winner}!"
+            sources = [n1, n2]
+            return jsonify({"answer": answer, "sources": sources})
+
+    # ============================================
+    # تحية
+    # ============================================
+    if any(w in q for w in ["مرحبا", "هلا", "السلام", "اهلا", "هاي", "hi", "hello", "hey", "good morning", "good evening"]):
+        answer = "مرحباً! أنا مساعد فرصتي 🤖\nاسألني عن أي نشاط تجاري وأساعدك تختار أفضل حي في الرياض!\n\nمثلاً:\n• وين أفضل حي لمطعم؟\n• هل حي العليا مناسب لصيدلية؟\n• أي حي فيه أقل منافسة؟" if lang == "ar" else "Hello! I'm Forsati's assistant 🤖\nAsk me about any business and I'll help you find the best neighborhood in Riyadh!"
+
+    # ============================================
+    # شكراً
+    # ============================================
+    elif any(w in q for w in ["شكرا", "شكراً", "مشكور", "يسلمو", "thanks", "thank you", "thx"]):
+        answer = "العفو! أي خدمة ثانية؟ 😊" if lang == "ar" else "You're welcome! Anything else? 😊"
+
+    # ============================================
+    # ما هو فرصتي / عن المشروع
+    # ============================================
+    elif any(w in q for w in ["ما هو", "وش هو", "عن", "فرصتي", "المشروع", "what is forsati", "about"]):
+        answer = "فرصتي 🎯 هي منصة ذكية تساعد رواد الأعمال على اختيار أفضل موقع لمشروعهم في الرياض.\n\nنستخدم:\n🤖 نموذج XGBoost مدرّب على بيانات حقيقية\n📊 تحليل الكثافة السكانية والمنافسة\n🚇 تقييم وسائل النقل والنشاط التجاري\n\nالنتيجة: درجة من 100 تخبرك إذا الحي مناسب لمشروعك!" if lang == "ar" else "Forsati 🎯 is a smart platform that helps entrepreneurs choose the best location for their business in Riyadh using XGBoost ML model trained on real data."
+
+    # ============================================
+    # حي محدد + فئة محددة
+    # ============================================
+    elif category and neighborhood:
         result = calculate_score(category, neighborhood)
         if result:
-            score  = result['final_score']
+            score = result['final_score']
+            d = result['details']
             cat_ar = categoryArabic.get(category, category)
-            d      = result['details']
-            nb_display = display_name(neighborhood)
-
-            if lang == 'en':
-                if score >= 70:
-                    verdict = "Very Suitable ✅"
-                    intro   = f"{nb_display} is an excellent choice for a {category}! 🎯"
-                elif score >= 50:
-                    verdict = "Suitable 🟡"
-                    intro   = f"{nb_display} has potential for a {category}, but needs more study."
-                else:
-                    verdict = "Not Suitable ❌"
-                    intro   = f"{nb_display} is not ideal for a {category}. Consider other neighborhoods."
-
-                answer  = f"{intro}\n\n"
-                answer += f"📊 Overall Score: {score}/100 — {verdict}\n\n"
-                answer += f"Score Breakdown:\n"
-                answer += f"🤖 Model Prediction: {d['ml_probability']}%\n"
-                answer += f"👥 Demand & Density: {d['demand_score']}%\n"
-                answer += f"⚖️ Competition Level: {d['competition_score']}%\n"
-                answer += f"🏪 Nearby Activity: {d['nearby_activity_score']}%\n"
-                answer += f"🚇 Transportation: {d['transport_score']}%\n"
-                answer += f"📈 Market Strength: {d['market_strength_score']}%"
+            if score >= 70:
+                verdict = "مناسب جداً ✅" if lang == "ar" else "Highly Suitable ✅"
+                intro = f"حي {neighborhood} خيار ممتاز لـ{cat_ar}! 🎯" if lang == "ar" else f"{neighborhood} is an excellent choice! 🎯"
+            elif score >= 50:
+                verdict = "مناسب 🟡" if lang == "ar" else "Suitable 🟡"
+                intro = f"حي {neighborhood} فيه إمكانية لـ{cat_ar}." if lang == "ar" else f"{neighborhood} has potential."
             else:
-                if score >= 70:
-                    verdict = "مناسب جداً ✅"
-                    intro   = f"حي {neighborhood} خيار ممتاز لـ{cat_ar}! 🎯"
-                elif score >= 50:
-                    verdict = "مناسب 🟡"
-                    intro   = f"حي {neighborhood} فيه إمكانية لـ{cat_ar}، بس تحتاج دراسة أكثر."
-                else:
-                    verdict = "غير مناسب ❌"
-                    intro   = f"حي {neighborhood} مو مثالي لـ{cat_ar}، أنصحك تشوف أحياء ثانية."
+                verdict = "غير مناسب ❌" if lang == "ar" else "Not Suitable ❌"
+                intro = f"حي {neighborhood} مو مثالي لـ{cat_ar}." if lang == "ar" else f"{neighborhood} is not ideal."
 
-                answer  = f"{intro}\n\n"
-                answer += f"📊 الدرجة الكلية: {score}/100 — {verdict}\n\n"
-                answer += f"تفاصيل التقييم:\n"
-                answer += f"🤖 توقع النموذج: {d['ml_probability']}%\n"
-                answer += f"👥 الطلب والكثافة: {d['demand_score']}%\n"
-                answer += f"⚖️ مستوى المنافسة: {d['competition_score']}%\n"
-                answer += f"🏪 النشاط التجاري القريب: {d['nearby_activity_score']}%\n"
-                answer += f"🚇 المواصلات: {d['transport_score']}%\n"
-                answer += f"📈 قوة السوق: {d['market_strength_score']}%"
+            if lang == "ar":
+                answer = f"{intro}\n\n📊 الدرجة الكلية: {score}/100 — {verdict}\n\nتفاصيل التقييم:\n🤖 توقع النموذج: {d['ml_probability']}%\n👥 الطلب والكثافة: {d['demand_score']}%\n⚖️ مستوى المنافسة: {d['competition_score']}%\n🏪 النشاط التجاري القريب: {d['nearby_activity_score']}%\n🚇 المواصلات: {d['transport_score']}%\n📈 قوة السوق: {d['market_strength_score']}%"
+            else:
+                answer = f"{intro}\n\n📊 Overall Score: {score}/100 — {verdict}\n\nBreakdown:\n🤖 Model: {d['ml_probability']}%\n👥 Demand: {d['demand_score']}%\n⚖️ Competition: {d['competition_score']}%\n🏪 Nearby Activity: {d['nearby_activity_score']}%\n🚇 Transport: {d['transport_score']}%\n📈 Market: {d['market_strength_score']}%"
+            sources = [neighborhood]
 
-            return jsonify({"answer": answer, "sources": [nb_display]})
+    # ============================================
+    # حي محدد بدون فئة
+    # ============================================
+    elif neighborhood and not category:
+        result = calculate_score("restaurant", neighborhood)
+        if result:
+            d = result['details']
+            if lang == "ar":
+                answer = f"معلومات عن حي {neighborhood} 📍\n\n⚖️ مستوى المنافسة: {d['competition_score']}%\n👥 الكثافة السكانية: {d['demand_score']}%\n🚇 المواصلات: {d['transport_score']}%\n🏪 النشاط التجاري: {d['nearby_activity_score']}%\n📈 قوة السوق: {d['market_strength_score']}%\n\nأخبرني نوع مشروعك وأعطيك تقييم أدق! 😊"
+            else:
+                answer = f"Info about {neighborhood} 📍\n\n⚖️ Competition: {d['competition_score']}%\n👥 Density: {d['demand_score']}%\n🚇 Transport: {d['transport_score']}%\n🏪 Activity: {d['nearby_activity_score']}%\n📈 Market: {d['market_strength_score']}%"
+            sources = [neighborhood]
 
-    # ===== 3. فئة فقط → أفضل 3 أحياء =====
-    if category:
-        cat_ar  = categoryArabic.get(category, category)
+    # ============================================
+    # فئة محددة بدون حي — أفضل الأحياء
+    # ============================================
+    elif category and not neighborhood:
+        cat_ar = categoryArabic.get(category, category)
         results = []
         for n in sorted(df['neighborhood'].unique()):
             s = calculate_score(category, n)
             if s:
                 results.append(s)
         results = sorted(results, key=lambda x: x['final_score'], reverse=True)[:3]
+        medals = ["🥇", "🥈", "🥉"]
+        if lang == "ar":
+            answer = f"أفضل الأحياء لـ{cat_ar} في الرياض 🏆\n\n"
+            for i, r in enumerate(results):
+                d = r['details']
+                answer += f"{medals[i]} {r['neighborhood']} — {r['final_score']}/100\n"
+                answer += f"   👥 الطلب: {d['demand_score']}% | ⚖️ المنافسة: {d['competition_score']}% | 🚇 النقل: {d['transport_score']}%\n\n"
+            answer += "تقدر تشوف تفاصيل أكثر من البحث في الموقع! 😊"
+        else:
+            answer = f"Best neighborhoods for a {category} in Riyadh 🏆\n\n"
+            for i, r in enumerate(results):
+                d = r['details']
+                answer += f"{medals[i]} {r['neighborhood']} — {r['final_score']}/100\n"
+                answer += f"   👥 Demand: {d['demand_score']}% | ⚖️ Competition: {d['competition_score']}% | 🚇 Transit: {d['transport_score']}%\n\n"
+        sources = [r['neighborhood'] for r in results]
 
-        if results:
-            medals  = ["🥇", "🥈", "🥉"]
-            sources = [display_name(r['neighborhood']) for r in results]
+    # ============================================
+    # المنافسة (بدون فئة أو حي)
+    # ============================================
+    elif any(w in q for w in ["منافسة", "تنافس", "منافس", "زحمة", "competition", "compete"]):
+        results = []
+        for n in df["neighborhood"].unique():
+            s = calculate_score("restaurant", n)
+            if s:
+                results.append({"neighborhood": n, "competition": s["details"]["competition_score"]})
 
-            if lang == 'en':
-                answer = f"Best neighborhoods for a {category} in Riyadh 🏆\n\n"
-                for i, r in enumerate(results):
-                    d = r['details']
-                    answer += f"{medals[i]} {display_name(r['neighborhood'])} — {r['final_score']}/100\n"
-                    answer += f"   👥 Demand: {d['demand_score']}% | ⚖️ Competition: {d['competition_score']}% | 🚇 Transit: {d['transport_score']}%\n\n"
-                answer += "You can view more details through the search on the website! 😊"
-            else:
-                answer = f"أفضل الأحياء لـ{cat_ar} في الرياض 🏆\n\n"
-                for i, r in enumerate(results):
-                    d = r['details']
-                    answer += f"{medals[i]} {r['neighborhood']} — {r['final_score']}/100\n"
-                    answer += f"   👥 الطلب: {d['demand_score']}% | ⚖️ المنافسة: {d['competition_score']}% | 🚇 النقل: {d['transport_score']}%\n\n"
-                answer += "تقدر تشوف تفاصيل أكثر من خلال البحث في الموقع! 😊"
+        if any(w in q for w in ["عالية", "مرتفعة", "قوية", "أكثر", "أعلى", "اعلى", "highest", "most", "high"]):
+            results = sorted(results, key=lambda x: x["competition"], reverse=True)[:3]
+            answer = "الأحياء الأعلى بالمنافسة:\n" if lang == "ar" else "Most competitive neighborhoods:\n"
+        else:
+            results = sorted(results, key=lambda x: x["competition"])[:3]
+            answer = "الأحياء الأقل بالمنافسة:\n" if lang == "ar" else "Least competitive neighborhoods:\n"
 
-            return jsonify({"answer": answer, "sources": sources})
+        for r in results:
+            answer += f"- {r['neighborhood']} ({r['competition']}%)\n"
+        sources = [r["neighborhood"] for r in results]
 
-    # ===== 4. تحيات — بعد كل الـ checks المفيدة =====
-    greeting_ar = ["مرحبا", "هلا", "السلام", "اهلا", "أهلا"]
-    # نبحث عن كلمة مستقلة لتجنب false positive مثل "highest"
-    greeting_en = ["hello", "hey", "greetings", "good morning", "good evening"]
-    q_words = set(q_lower.split())
-    if any(w in question for w in greeting_ar) or any(w in q_words for w in greeting_en):
-        if lang == 'en':
-            return jsonify({"answer": "Hello! I'm the Forsati assistant 🤖\nAsk me about any business type and I'll help you find the best neighborhood in Riyadh!"})
-        return jsonify({"answer": "مرحباً! أنا مساعد فرصتي 🤖\nاسأليني عن أي نشاط تجاري وأساعدك تختاري أفضل حي في الرياض!"})
+    # ============================================
+    # الكثافة السكانية
+    # ============================================
+    elif any(w in q for w in ["كثافة", "سكان", "سكانية", "population", "density", "crowded"]):
+        if any(w in q for w in ["أقل", "اقل", "منخفض", "lowest", "low", "least"]):
+            top = df.groupby("neighborhood")["population_density"].mean().sort_values(ascending=True).head(3)
+            answer = "الأحياء الأقل كثافة سكانية:\n" if lang == "ar" else "Least populated neighborhoods:\n"
+        else:
+            top = df.groupby("neighborhood")["population_density"].mean().sort_values(ascending=False).head(3)
+            answer = "الأحياء الأعلى كثافة سكانية:\n" if lang == "ar" else "Most populated neighborhoods:\n"
+        for n, val in top.items():
+            answer += f"- {n} ({int(val):,} نسمة/كم²)\n"
+        sources = top.index.tolist()
 
-    # ===== 5. شكر =====
-    thanks_ar = ["شكرا", "شكراً", ]
-    thanks_en = ["thanks", "thank you", "appreciate"]
-    if any(w in question for w in thanks_ar) or any(w in q_lower for w in thanks_en):
-        if lang == 'en':
-            return jsonify({"answer": "You're welcome! Anything else I can help with? 😊"})
-        return jsonify({"answer": "العفو! أي خدمة ثانية؟ 😊"})
+    # ============================================
+    # المواصلات والنقل
+    # ============================================
+    elif any(w in q for w in ["مواصلات", "مترو", "نقل", "باص", "حافلة", "transport", "metro", "bus", "transit"]):
+        results = []
+        for n in df["neighborhood"].unique():
+            s = calculate_score("restaurant", n)
+            if s:
+                results.append({"neighborhood": n, "transport": s["details"]["transport_score"]})
+        results = sorted(results, key=lambda x: x["transport"], reverse=True)[:3]
+        answer = "أفضل الأحياء بالمواصلات:\n" if lang == "ar" else "Best neighborhoods for transportation:\n"
+        for r in results:
+            answer += f"- {r['neighborhood']} ({r['transport']}%)\n"
+        sources = [r["neighborhood"] for r in results]
 
-    # ===== ما فهم السؤال =====
-    if lang == 'en':
-        return jsonify({"answer": "I didn't quite understand your question 😅\nTry asking:\n• What's the best neighborhood for a restaurant?\n• Is Al-Malaz suitable for a cafe?\n• Which neighborhood has the highest population density?"})
-    return jsonify({"answer": "ما فهمت سؤالك كويس 😅\nجرب تسألني مثلاً:\n• وين أفضل حي لمطعم؟\n• هل حي الملز مناسب لكافيه؟\n• أي حي فيه أعلى كثافة سكانية؟"})
+    # ============================================
+    # قوة السوق / النشاط التجاري
+    # ============================================
+    elif any(w in q for w in ["سوق", "تجاري", "نشاط", "رخص", "market", "business", "commercial"]):
+        results = []
+        for n in df["neighborhood"].unique():
+            s = calculate_score("restaurant", n)
+            if s:
+                results.append({"neighborhood": n, "market": s["details"]["market_strength_score"]})
+        results = sorted(results, key=lambda x: x["market"], reverse=True)[:3]
+        answer = "أقوى الأحياء تجارياً:\n" if lang == "ar" else "Strongest commercial neighborhoods:\n"
+        for r in results:
+            answer += f"- {r['neighborhood']} ({r['market']}%)\n"
+        sources = [r["neighborhood"] for r in results]
 
+    # ============================================
+    # الطلب / الفرصة
+    # ============================================
+    elif any(w in q for w in ["طلب", "فرصة", "demand", "opportunity"]):
+        results = []
+        for n in df["neighborhood"].unique():
+            s = calculate_score("restaurant", n)
+            if s:
+                results.append({"neighborhood": n, "demand": s["details"]["demand_score"]})
+        results = sorted(results, key=lambda x: x["demand"], reverse=True)[:3]
+        answer = "الأحياء الأعلى طلباً:\n" if lang == "ar" else "Highest demand neighborhoods:\n"
+        for r in results:
+            answer += f"- {r['neighborhood']} ({r['demand']}%)\n"
+        sources = [r["neighborhood"] for r in results]
 
-if __name__ == '__main__':
-    app.run(debug=False, host='0.0.0.0', port=5000)
+    # ============================================
+    # كيف يعمل النظام / الدرجة
+    # ============================================
+    elif any(w in q for w in ["كيف", "طريقة", "نظام", "درجة", "تقييم", "how", "score", "rating", "system", "work"]):
+        answer = "طريقة عمل فرصتي 🔍\n\nنحسب درجة لكل حي من 100 بناءً على:\n\n🤖 40% — توقع نموذج XGBoost\n👥 20% — الكثافة السكانية والطلب\n⚖️ 15% — مستوى المنافسة\n🏪 10% — النشاط التجاري القريب\n🚇 10% — وسائل النقل\n📈 5% — رخص الأعمال وقوة السوق\n\n✅ 70+ = مناسب جداً\n🟡 50-69 = مناسب\n🔴 أقل من 50 = غير مناسب" if lang == "ar" else "How Forsati works 🔍\n\nWe calculate a score from 100 based on:\n🤖 40% ML model (XGBoost)\n👥 20% Population density\n⚖️ 15% Competition level\n🏪 10% Nearby businesses\n🚇 10% Transportation\n📈 5% Market strength"
+
+    # ============================================
+    # عدد الأحياء / الفئات
+    # ============================================
+    elif any(w in q for w in ["كم حي", "عدد الاحياء", "كم فئة", "كم نشاط", "how many", "neighborhoods count"]):
+        n_count = len(df['neighborhood'].unique())
+        c_count = len(df['category_en'].unique())
+        answer = f"فرصتي تغطي:\n📍 {n_count} حي في الرياض\n🏪 {c_count} نوع نشاط تجاري\n\nاختر أي نشاط وأي حي وأعطيك تقييم فوري! 😊" if lang == "ar" else f"Forsati covers:\n📍 {n_count} neighborhoods in Riyadh\n🏪 {c_count} business categories"
+
+    # ============================================
+    # أفضل حي بشكل عام
+    # ============================================
+    elif any(w in q for w in ["أفضل حي", "افضل حي", "best neighborhood", "top neighborhood"]):
+        results = []
+        for n in sorted(df['neighborhood'].unique()):
+            s = calculate_score("restaurant", n)
+            if s:
+                results.append(s)
+        results = sorted(results, key=lambda x: x['final_score'], reverse=True)[:3]
+        answer = "أفضل الأحياء عموماً في الرياض 🏆\n\n" if lang == "ar" else "Best neighborhoods in Riyadh 🏆\n\n"
+        medals = ["🥇", "🥈", "🥉"]
+        for i, r in enumerate(results):
+            answer += f"{medals[i]} {r['neighborhood']} — {r['final_score']}/100\n"
+        sources = [r['neighborhood'] for r in results]
+
+    # ============================================
+    # رد افتراضي ذكي
+    # ============================================
+    else:
+        answer = "ما فهمت سؤالك كويس 😅\n\nجرب تسألني:\n• وين أفضل حي لمطعم؟\n• هل حي العليا مناسب لصيدلية؟\n• أي حي فيه أقل منافسة؟\n• أي حي فيه أعلى كثافة سكانية؟\n• كيف المواصلات في الملز؟\n• كيف يعمل النظام؟\n• كم حي تغطي فرصتي؟" if lang == "ar" else "I didn't understand your question 😅\n\nTry asking:\n• Best neighborhood for a restaurant?\n• Is Al-Olaya good for a pharmacy?\n• Which neighborhood has least competition?\n• How does the system work?"
+
+    return jsonify({"answer": answer, "sources": sources})
+
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)

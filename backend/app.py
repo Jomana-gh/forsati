@@ -36,6 +36,23 @@ feature_cols = saved['features']
 
 df = pd.read_csv('forsati_final_dataset.csv')
 
+# Feature Engineering — نفس اللي في النموذج الجديد
+df['category_share'] = df['category_count'] / (df['total_businesses'] + 1)
+df['pop_per_business'] = df['Population'] / (df['total_businesses'] + 1)
+df['transport_index'] = df['metro'] + df['bus'] + df['public_station']
+df['nearby_competition_density'] = df['nearby_same_category'] / (df['nearby_all_businesses'] + 1)
+df['economic_index'] = df['annual_transactions'] / (df['Population'] + 1)
+df['pop_density_per_km2'] = df['Population'] / (df['Area_km2'] + 0.01)
+ 
+# Target Encoding — نفس اللي في النموذج الجديد
+neighborhood_success_rate = df.groupby('neighborhood')['success'].mean()
+df['neighborhood_success_rate'] = df['neighborhood'].map(neighborhood_success_rate)
+df['neighborhood_success_rate'] = df['neighborhood_success_rate'].fillna(df['success'].mean())
+ 
+category_success_rate = df.groupby('category_en')['success'].mean()
+df['category_success_rate'] = df['category_en'].map(category_success_rate)
+df['category_success_rate'] = df['category_success_rate'].fillna(df['success'].mean())
+
 centroid_dict = {
     "الجرادية": (24.615341, 46.698203),
     "الدريهمية": (24.589588, 46.696444),
@@ -187,22 +204,31 @@ def build_candidate_row(category_name, neighborhood_name):
         (df['neighborhood'] == neighborhood_name)
     ]
     neighborhood_rows = df[df['neighborhood'] == neighborhood_name]
-
+    category_rows     = df[df['category_en'] == category_name]
+ 
     if len(pair_rows) > 0:
         base = pair_rows.mean(numeric_only=True)
+    elif len(neighborhood_rows) > 0 and len(category_rows) > 0:
+        base = (neighborhood_rows.mean(numeric_only=True) + category_rows.mean(numeric_only=True)) / 2
     elif len(neighborhood_rows) > 0:
         base = neighborhood_rows.mean(numeric_only=True)
     else:
         return None
-
+ 
     row = pd.DataFrame([base])
-    category_code = df[df['category_en'] == category_name]['category_encoded'].iloc[0]
-    row['category_encoded'] = category_code
-
+ 
+    # Restore encodings
+    row['category_encoded'] = df[df['category_en'] == category_name]['category_encoded'].iloc[0]
+    row['neighborhood_success_rate'] = neighborhood_success_rate.get(neighborhood_name, df['success'].mean())
+    row['category_success_rate']     = category_success_rate.get(category_name, df['success'].mean())
+ 
+    # Recompute engineered features
+    row['transport_index'] = row['metro'] + row['bus'] + row['public_station']
+ 
     for col in feature_cols:
         if col not in row.columns:
             row[col] = 0
-
+ 
     return row[feature_cols]
 
 

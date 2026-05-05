@@ -6,7 +6,6 @@ const API = "https://forsati-api.onrender.com";
 
 const suggestedQuestionsAr = [
   "وين أفضل حي لفتح مطعم في الرياض؟",
-  "ما هي الأحياء الأقل منافسة للمحلات التجارية؟",
   "أي حي فيه أعلى كثافة سكانية؟",
   "وين أفتح صيدلية بأقل منافسة؟",
 ];
@@ -21,7 +20,7 @@ const suggestedQuestionsEn = [
 export default function Chatbot({ lang = "ar", t }) {
   const [open, setOpen] = useState(false);
   const welcomeMsg = lang === "ar"
-    ? "مرحباً! أنا مساعد فرصتي\nاسأليني عن أي حي في الرياض وسأساعدك تختاري أفضل موقع لمشروعك."
+    ? "مرحباً! أنا مساعد فرصتي\nاسألني عن أي حي في الرياض وسأساعدك تختار أفضل موقع لمشروعك."
     : "Hello! I am Forsati Assistant\nAsk me about any neighborhood in Riyadh and I will help you choose the best location for your business.";
 
   const [messages, setMessages] = useState([

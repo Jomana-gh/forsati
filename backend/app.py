@@ -550,7 +550,7 @@ def chatbot():
                     d = r['details']
                     answer += f"{medals[i]} {r['neighborhood']} — {r['final_score']}/100\n"
                     answer += f"   👥 الطلب: {d['demand_score']}% | ⚖️ المنافسة: {d['competition_score']}% | 🚇 النقل: {d['transport_score']}%\n\n"
-                answer += "تقدر تشوفي تفاصيل أكثر من خلال البحث في الموقع! 😊"
+                answer += "تقدر تشوف تفاصيل أكثر من خلال البحث في الموقع! 😊"
 
             return jsonify({"answer": answer, "sources": sources})
 

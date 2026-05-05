@@ -575,7 +575,7 @@ def chatbot():
     # ===== ما فهم السؤال =====
     if lang == 'en':
         return jsonify({"answer": "I didn't quite understand your question 😅\nTry asking:\n• What's the best neighborhood for a restaurant?\n• Is Al-Malaz suitable for a cafe?\n• Which neighborhood has the highest population density?"})
-    return jsonify({"answer": "ما فهمت سؤالك كويس 😅\nجربي تسأليني مثلاً:\n• وين أفضل حي لمطعم؟\n• هل حي الملز مناسب لكافيه؟\n• أي حي فيه أعلى كثافة سكانية؟"})
+    return jsonify({"answer": "ما فهمت سؤالك كويس 😅\nجرب تسألني مثلاً:\n• وين أفضل حي لمطعم؟\n• هل حي الملز مناسب لكافيه؟\n• أي حي فيه أعلى كثافة سكانية؟"})
 
 
 if __name__ == '__main__':

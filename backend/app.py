@@ -375,6 +375,44 @@ def get_map(category):
 
 # ===== Chatbot =====
 
+neighborhoodEnglish = {
+    "الجرادية": "Al-Jaradia", "الدريهمية": "Al-Duraihimiyah",
+    "الشميسي": "Al-Shamisiyah", "الصالحية": "Al-Salihiyah",
+    "الصفا": "Al-Safa", "الضباط": "Al-Dabbat",
+    "العزيزية": "Al-Aziziyah", "العمل": "Al-Amal",
+    "الفوطة": "Al-Fawwaz", "المربع": "Al-Murabba",
+    "المرقب": "Al-Marqab", "المعذر": "Al-Muathar",
+    "الملز": "Al-Malaz", "المنصورة": "Al-Mansurah",
+    "الوزارات": "Al-Wizarat", "الوشام": "Al-Wisham",
+    "اليمامة": "Al-Yamamah", "عليشة": "Ulayshah",
+    "منفوحة": "Manfuhah", "الحمراء": "Al-Hamra",
+    "الخليج": "Al-Khalij", "الروضة": "Al-Rawdah",
+    "السعادة": "Al-Saadah", "السلام": "Al-Salam",
+    "السلي": "Al-Sali", "الفيحاء": "Al-Fayha",
+    "القدس": "Al-Quds", "المونسية": "Al-Munsiyah",
+    "النزهة": "Al-Nuzhah", "النسيم الشرقي": "Al-Naseem East",
+    "النسيم الغربي": "Al-Naseem West", "النهضة": "Al-Nahdah",
+    "اليرموك": "Al-Yarmuk", "غرناطة": "Gharnata",
+    "قرطبة": "Qurtubah", "الربيع": "Al-Rabi",
+    "السليمانية": "Al-Sulaymaniyah", "الصحافة": "Al-Sahafah",
+    "العارض": "Al-Arid", "العقيق": "Al-Aqiq",
+    "العليا": "Al-Olaya", "الغدير": "Al-Ghadir",
+    "المروج": "Al-Muruj", "النرجس": "Al-Narjis",
+    "النفل": "Al-Nafal", "الياسمين": "Al-Yasmin",
+    "حطين": "Hittin", "الحزم": "Al-Hazm",
+    "الدار البيضاء": "Al-Dar Al-Baida", "الروابي": "Al-Rawabi",
+    "الشفا": "Al-Shafa", "المروة": "Al-Marwah",
+    "بدر": "Badr", "طيبة": "Taybah",
+    "عكاظ": "Ukaz", "نمار": "Namar",
+    "السويدي": "Al-Suwaidi", "سلطانة": "Sultanah",
+    "شبرا": "Shubra", "ظهرة لبن": "Dhahrat Laban",
+}
+
+def translate_neighborhood(name, lang):
+    if lang == "en":
+        return neighborhoodEnglish.get(name, name)
+    return name
+
 categoryArabic = {
     "restaurant": "مطعم", "cafe": "كافيه", "supermarket": "سوبرماركت",
     "pharmacy": "صيدلية", "bakery": "مخبز", "gym": "نادي رياضي",
@@ -482,17 +520,29 @@ def chat():
 
             if lang == "ar":
                 answer = f"مقارنة بين {n1} و {n2} لـ{cat_ar} ⚖️\n\n"
-                answer += f"{'حي':<15} {'الدرجة':>8} {'الطلب':>8} {'المنافسة':>10} {'النقل':>8}\n"
-                answer += f"{'─'*50}\n"
-                answer += f"{n1:<15} {r1['final_score']:>8} {d1['demand_score']:>8}% {d1['competition_score']:>10}% {d1['transport_score']:>8}%\n"
-                answer += f"{n2:<15} {r2['final_score']:>8} {d2['demand_score']:>8}% {d2['competition_score']:>10}% {d2['transport_score']:>8}%\n\n"
+                answer += f"🏘️ {n1} — {r1['final_score']}/100\n"
+                answer += f"   🤖 النموذج: {d1['ml_probability']}%\n"
+                answer += f"   👥 الطلب: {d1['demand_score']}%\n"
+                answer += f"   ⚖️ المنافسة: {d1['competition_score']}%\n"
+                answer += f"   🚇 النقل: {d1['transport_score']}%\n\n"
+                answer += f"🏘️ {n2} — {r2['final_score']}/100\n"
+                answer += f"   🤖 النموذج: {d2['ml_probability']}%\n"
+                answer += f"   👥 الطلب: {d2['demand_score']}%\n"
+                answer += f"   ⚖️ المنافسة: {d2['competition_score']}%\n"
+                answer += f"   🚇 النقل: {d2['transport_score']}%\n\n"
                 answer += f"🏆 الفائز: حي {winner}!"
             else:
                 answer = f"Comparing {n1} vs {n2} for {cat} ⚖️\n\n"
-                answer += f"{'Neighborhood':<15} {'Score':>6} {'Demand':>8} {'Compete':>9} {'Transit':>8}\n"
-                answer += f"{'─'*50}\n"
-                answer += f"{n1:<15} {r1['final_score']:>6} {d1['demand_score']:>8}% {d1['competition_score']:>9}% {d1['transport_score']:>8}%\n"
-                answer += f"{n2:<15} {r2['final_score']:>6} {d2['demand_score']:>8}% {d2['competition_score']:>9}% {d2['transport_score']:>8}%\n\n"
+                answer += f"🏘️ {n1} — {r1['final_score']}/100\n"
+                answer += f"   🤖 Model: {d1['ml_probability']}%\n"
+                answer += f"   👥 Demand: {d1['demand_score']}%\n"
+                answer += f"   ⚖️ Competition: {d1['competition_score']}%\n"
+                answer += f"   🚇 Transit: {d1['transport_score']}%\n\n"
+                answer += f"🏘️ {n2} — {r2['final_score']}/100\n"
+                answer += f"   🤖 Model: {d2['ml_probability']}%\n"
+                answer += f"   👥 Demand: {d2['demand_score']}%\n"
+                answer += f"   ⚖️ Competition: {d2['competition_score']}%\n"
+                answer += f"   🚇 Transit: {d2['transport_score']}%\n\n"
                 answer += f"🏆 Winner: {winner}!"
             sources = [n1, n2]
             return jsonify({"answer": answer, "sources": sources})

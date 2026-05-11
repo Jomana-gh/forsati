@@ -14,7 +14,7 @@ import {
   Download, GitCompare, MessageSquarePlus, Menu, X
 } from "lucide-react";
 
-const API = "https://forsati-api.onrender.com";
+const API = "http://127.0.0.1:5000";
 
 const T = {
   ar: {

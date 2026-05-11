@@ -11,6 +11,34 @@ import pickle
 import warnings
 warnings.filterwarnings('ignore')
 
+import json
+import os
+from datetime import datetime
+
+REVIEWS_FILE  = 'reviews.json'
+CONTACTS_FILE = 'contacts.json'
+
+def load_reviews():
+    if os.path.exists(REVIEWS_FILE):
+        with open(REVIEWS_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    return []
+
+def save_review(review):
+    reviews = load_reviews()
+    reviews.append(review)
+    with open(REVIEWS_FILE, 'w', encoding='utf-8') as f:
+        json.dump(reviews, f, ensure_ascii=False, indent=2)
+
+def save_contact(contact):
+    contacts = []
+    if os.path.exists(CONTACTS_FILE):
+        with open(CONTACTS_FILE, 'r', encoding='utf-8') as f:
+            contacts = json.load(f)
+    contacts.append(contact)
+    with open(CONTACTS_FILE, 'w', encoding='utf-8') as f:
+        json.dump(contacts, f, ensure_ascii=False, indent=2)
+
 app = Flask(__name__)
 CORS(app)
 
@@ -372,6 +400,55 @@ def get_map(category):
     rankings = sorted(rankings, key=lambda x: x['final_score'], reverse=True)
     return jsonify(convert_to_serializable({'category': category, 'rankings': rankings}))
 
+# جلب التعليقات
+@app.route('/api/reviews', methods=['GET'])
+def get_reviews():
+    reviews = load_reviews()
+    return jsonify({'reviews': reviews})
+
+# إضافة تعليق
+@app.route('/api/reviews', methods=['POST'])
+def add_review():
+    data = request.json
+    name    = data.get('name', '').strip()
+    rating  = data.get('rating', 5)
+    comment = data.get('comment', '').strip()
+    role    = data.get('role', '').strip()
+
+    if not name or not comment:
+        return jsonify({'error': 'name and comment required'}), 400
+
+    review = {
+        'id': datetime.now().strftime('%Y%m%d%H%M%S'),
+        'name': name,
+        'role': role,
+        'rating': rating,
+        'comment': comment,
+        'date': datetime.now().strftime('%Y-%m-%d')
+    }
+    save_review(review)
+    return jsonify({'success': True, 'review': review})
+
+# ===== Contact Route =====
+@app.route('/api/contact', methods=['POST'])
+def contact():
+    data    = request.json
+    name    = data.get('name', '').strip()
+    email   = data.get('email', '').strip()
+    msg     = data.get('msg', '').strip()
+
+    if not name or not email or not msg:
+        return jsonify({'error': 'all fields required'}), 400
+
+    contact_entry = {
+        'id':    datetime.now().strftime('%Y%m%d%H%M%S'),
+        'name':  name,
+        'email': email,
+        'msg':   msg,
+        'date':  datetime.now().strftime('%Y-%m-%d %H:%M'),
+    }
+    save_contact(contact_entry)
+    return jsonify({'success': True})
 
 # ===== Chatbot =====
 

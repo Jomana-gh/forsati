@@ -1,6 +1,8 @@
 # ============================================================
 # مشروع فرصتي - Flask API
 # ============================================================
+from flask_sqlalchemy import SQLAlchemy
+import os
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -15,33 +17,36 @@ import json
 import os
 from datetime import datetime
 
-REVIEWS_FILE  = 'reviews.json'
-CONTACTS_FILE = 'contacts.json'
-
-def load_reviews():
-    if os.path.exists(REVIEWS_FILE):
-        with open(REVIEWS_FILE, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    return []
-
-def save_review(review):
-    reviews = load_reviews()
-    reviews.append(review)
-    with open(REVIEWS_FILE, 'w', encoding='utf-8') as f:
-        json.dump(reviews, f, ensure_ascii=False, indent=2)
-
-def save_contact(contact):
-    contacts = []
-    if os.path.exists(CONTACTS_FILE):
-        with open(CONTACTS_FILE, 'r', encoding='utf-8') as f:
-            contacts = json.load(f)
-    contacts.append(contact)
-    with open(CONTACTS_FILE, 'w', encoding='utf-8') as f:
-        json.dump(contacts, f, ensure_ascii=False, indent=2)
-
 app = Flask(__name__)
 CORS(app)
 
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
+    "DATABASE_URL",
+    "sqlite:///forsati.db"
+)
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+db = SQLAlchemy(app)
+
+with app.app_context():
+    db.create_all()
+
+# ===== Database Models =====
+
+class Review(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    role = db.Column(db.String(100))
+    rating = db.Column(db.Integer, default=5)
+    comment = db.Column(db.Text, nullable=False)
+    date = db.Column(db.String(50))
+
+class Contact(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), nullable=False)
+    msg = db.Column(db.Text, nullable=False)
+    date = db.Column(db.String(50))
 
 def convert_to_serializable(obj):
     if isinstance(obj, dict):
@@ -403,60 +408,88 @@ def get_map(category):
 # جلب التعليقات
 @app.route('/api/reviews', methods=['GET'])
 def get_reviews():
-    reviews = load_reviews()
-    return jsonify({'reviews': reviews})
+    reviews = Review.query.order_by(Review.id.desc()).all()
+
+    result = []
+
+    for r in reviews:
+        result.append({
+            'id': r.id,
+            'name': r.name,
+            'role': r.role,
+            'rating': r.rating,
+            'comment': r.comment,
+            'date': r.date
+        })
+
+    return jsonify({'reviews': result})
 
 # إضافة تعليق
 @app.route('/api/reviews', methods=['POST'])
 def add_review():
     data = request.json
-    name    = data.get('name', '').strip()
-    rating  = data.get('rating', 5)
+
+    name = data.get('name', '').strip()
+    rating = data.get('rating', 5)
     comment = data.get('comment', '').strip()
-    role    = data.get('role', '').strip()
+    role = data.get('role', '').strip()
 
     if not name or not comment:
         return jsonify({'error': 'name and comment required'}), 400
 
-    review = {
-        'id': datetime.now().strftime('%Y%m%d%H%M%S'),
-        'name': name,
-        'role': role,
-        'rating': rating,
-        'comment': comment,
-        'date': datetime.now().strftime('%Y-%m-%d')
-    }
-    save_review(review)
-    return jsonify({'success': True, 'review': review})
+    review = Review(
+        name=name,
+        role=role,
+        rating=rating,
+        comment=comment,
+        date=datetime.now().strftime('%Y-%m-%d')
+    )
+
+    db.session.add(review)
+    db.session.commit()
+
+    return jsonify({'success': True})
 
 # ===== Contact Route =====
 @app.route('/api/contact', methods=['POST'])
 def contact():
-    data    = request.json
-    name    = data.get('name', '').strip()
-    email   = data.get('email', '').strip()
-    msg     = data.get('msg', '').strip()
+    data = request.json
+
+    name = data.get('name', '').strip()
+    email = data.get('email', '').strip()
+    msg = data.get('msg', '').strip()
 
     if not name or not email or not msg:
         return jsonify({'error': 'all fields required'}), 400
 
-    contact_entry = {
-        'id':    datetime.now().strftime('%Y%m%d%H%M%S'),
-        'name':  name,
-        'email': email,
-        'msg':   msg,
-        'date':  datetime.now().strftime('%Y-%m-%d %H:%M'),
-    }
-    save_contact(contact_entry)
+    contact_entry = Contact(
+        name=name,
+        email=email,
+        msg=msg,
+        date=datetime.now().strftime('%Y-%m-%d %H:%M')
+    )
+
+    db.session.add(contact_entry)
+    db.session.commit()
+
     return jsonify({'success': True})
 
 @app.route('/api/contacts', methods=['GET'])
 def get_contacts():
-    contacts = []
-    if os.path.exists(CONTACTS_FILE):
-        with open(CONTACTS_FILE, 'r', encoding='utf-8') as f:
-            contacts = json.load(f)
-    return jsonify({'contacts': contacts})
+    contacts = Contact.query.order_by(Contact.id.desc()).all()
+
+    result = []
+
+    for c in contacts:
+        result.append({
+            'id': c.id,
+            'name': c.name,
+            'email': c.email,
+            'msg': c.msg,
+            'date': c.date
+        })
+
+    return jsonify({'contacts': result})
 
 # ===== Chatbot =====
 

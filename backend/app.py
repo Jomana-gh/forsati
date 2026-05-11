@@ -450,6 +450,14 @@ def contact():
     save_contact(contact_entry)
     return jsonify({'success': True})
 
+@app.route('/api/contacts', methods=['GET'])
+def get_contacts():
+    contacts = []
+    if os.path.exists(CONTACTS_FILE):
+        with open(CONTACTS_FILE, 'r', encoding='utf-8') as f:
+            contacts = json.load(f)
+    return jsonify({'contacts': contacts})
+
 # ===== Chatbot =====
 
 neighborhoodEnglish = {

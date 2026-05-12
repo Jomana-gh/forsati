@@ -20,7 +20,7 @@ from psycopg2.extras import RealDictCursor
 import google.generativeai as genai
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-print("GEMINI KEY EXISTS:", GEMINI_API_KEY is not None)
+print("KEY:", GEMINI_API_KEY[:10] if GEMINI_API_KEY else "NO KEY")
 
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)

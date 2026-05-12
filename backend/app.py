@@ -411,6 +411,33 @@ def chat():
 
         detected_nb = detected_neighborhoods[0] if detected_neighborhoods else None
 
+        # كشف الفئة (لازم قبل المقارنة)
+        cat_keywords = {
+            "restaurant": ["مطعم", "restaurant", "food", "اكل"],
+            "cafe": ["كافيه", "cafe", "coffee", "قهوة"],
+            "pharmacy": ["صيدلية", "pharmacy", "دواء"],
+            "supermarket": ["سوبرماركت", "supermarket", "هايبر"],
+            "gym": ["جيم", "gym", "نادي رياضي"],
+            "grocery": ["بقالة", "grocery"],
+            "clothing": ["ملابس", "clothing", "fashion"],
+            "bakery": ["مخبز", "bakery", "خبز"],
+            "sweets": ["حلويات", "sweets", "dessert"],
+            "salon": ["صالون", "salon", "beauty"],
+            "hotel": ["فندق", "hotel"],
+            "jewelry": ["مجوهرات", "jewelry", "ذهب"],
+            "shoes": ["أحذية", "shoes"],
+            "perfume": ["عطور", "perfume"],
+            "spa": ["سبا", "spa"],
+        }
+        detected_cat = None
+        for cat, kws in cat_keywords.items():
+            for kw in kws:
+                if kw in question.lower():
+                    detected_cat = cat
+                    break
+            if detected_cat:
+                break
+
         # مقارنة بين حيين
         is_compare = any(w in question.lower() for w in ["قارن", "مقارنة", "versus", "vs", "compare", "أو", "او", "or", "أفضل من", "احسن من"])
         if len(detected_neighborhoods) >= 2 and is_compare:
@@ -442,34 +469,6 @@ def chat():
 الفائز: {winner}
 """
                 detected_nb = None  # عشان ما يعيد الكشف
-
-        # كشف الفئة
-        cat_keywords = {
-            "restaurant": ["مطعم", "restaurant", "food", "اكل"],
-            "cafe": ["كافيه", "cafe", "coffee", "قهوة"],
-            "pharmacy": ["صيدلية", "pharmacy", "دواء"],
-            "supermarket": ["سوبرماركت", "supermarket", "هايبر"],
-            "gym": ["جيم", "gym", "نادي رياضي"],
-            "grocery": ["بقالة", "grocery"],
-            "clothing": ["ملابس", "clothing", "fashion"],
-            "bakery": ["مخبز", "bakery", "خبز"],
-            "sweets": ["حلويات", "sweets", "dessert"],
-            "salon": ["صالون", "salon", "beauty"],
-            "hotel": ["فندق", "hotel"],
-            "pharmacy": ["صيدلية", "pharmacy"],
-            "jewelry": ["مجوهرات", "jewelry", "ذهب"],
-            "shoes": ["أحذية", "shoes"],
-            "perfume": ["عطور", "perfume"],
-            "spa": ["سبا", "spa"],
-        }
-        detected_cat = None
-        for cat, kws in cat_keywords.items():
-            for kw in kws:
-                if kw in question.lower():
-                    detected_cat = cat
-                    break
-            if detected_cat:
-                break
 
         # بناء context من البيانات الحقيقية
         forsati_context = ""

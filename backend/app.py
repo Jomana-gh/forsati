@@ -24,7 +24,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 print("KEY:", GEMINI_API_KEY[:10] if GEMINI_API_KEY else "NO KEY")
 
 # متغيرات Gemini
-MODEL_NAME = 'models/gemini-2.0-flash-001'  # نموذج متاح للحسابات الجديدة
+MODEL_NAME = 'models/gemini-2.5-flash', # نموذج متاح للحسابات الجديدة
 
 system_instruction = """أنت مساعد فرصتي، خبير بأحياء الرياض التجارية.
 أجب بالعربية أو الإنجليزية حسب لغة المستخدم.
@@ -625,7 +625,7 @@ def chat():
 - لا تخترع أرقاماً، استخدم البيانات الحقيقية فقط"""
  
         response = client.models.generate_content(
-            model='models/gemini-2.0-flash',
+            model='models/gemini-2.5-flash',
             contents=f"{system_prompt}\n\nسؤال المستخدم: {question}",
             config=types.GenerateContentConfig(
                 temperature=0.7,

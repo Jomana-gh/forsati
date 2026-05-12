@@ -643,11 +643,11 @@ def chat():
 @app.route('/api/models', methods=['GET'])
 def list_models():
     try:
-        models = [m.name for m in genai.list_models()]
-        return jsonify({'models': models})
+        models = client.models.list()
+        return jsonify({'models': [m.name for m in models]})
     except Exception as e:
         return jsonify({'error': str(e)})
- 
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

@@ -625,7 +625,7 @@ def chat():
 - لا تخترع أرقاماً، استخدم البيانات الحقيقية فقط"""
  
         response = client.models.generate_content(
-            model='gemini-1.5-flash',
+            model='models/gemini-2.0-flash',
             contents=f"{system_prompt}\n\nسؤال المستخدم: {question}",
             config=types.GenerateContentConfig(
                 temperature=0.7,

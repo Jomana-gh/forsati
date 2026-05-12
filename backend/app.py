@@ -398,18 +398,50 @@ def chat():
         return jsonify({"answer": "عذراً، خدمة المساعد غير متاحة حالياً 😅"})
 
     try:
-        # كشف الحي
-        detected_nb = None
+        # كشف كل الأحياء في السؤال
+        detected_neighborhoods = []
         for n in df['neighborhood'].unique():
             if n in question:
-                detected_nb = n
-                break
-        if not detected_nb:
+                detected_neighborhoods.append(n)
+        if not detected_neighborhoods:
             q_lower = question.lower()
             for en, ar in neighborhood_en_to_ar.items():
-                if en in q_lower:
-                    detected_nb = ar
-                    break
+                if en in q_lower and ar not in detected_neighborhoods:
+                    detected_neighborhoods.append(ar)
+
+        detected_nb = detected_neighborhoods[0] if detected_neighborhoods else None
+
+        # مقارنة بين حيين
+        is_compare = any(w in question.lower() for w in ["قارن", "مقارنة", "versus", "vs", "compare", "أو", "او", "or", "أفضل من", "احسن من"])
+        if len(detected_neighborhoods) >= 2 and is_compare:
+            n1, n2 = detected_neighborhoods[0], detected_neighborhoods[1]
+            cat = detected_cat or "restaurant"
+            cat_ar = categoryArabic.get(cat, cat)
+            r1 = calculate_score(cat, n1)
+            r2 = calculate_score(cat, n2)
+            if r1 and r2:
+                d1, d2 = r1['details'], r2['details']
+                winner = n1 if r1['final_score'] > r2['final_score'] else n2
+                forsati_context = f"""
+بيانات حقيقية - مقارنة بين {n1} و {n2} لـ{cat_ar}:
+
+{n1}: {r1['final_score']}/100 ({r1['label']})
+  - توقع النموذج: {d1['ml_probability']}%
+  - الطلب والكثافة: {d1['demand_score']}%
+  - المنافسة: {d1['competition_score']}%
+  - المواصلات: {d1['transport_score']}%
+  - قوة السوق: {d1['market_strength_score']}%
+
+{n2}: {r2['final_score']}/100 ({r2['label']})
+  - توقع النموذج: {d2['ml_probability']}%
+  - الطلب والكثافة: {d2['demand_score']}%
+  - المنافسة: {d2['competition_score']}%
+  - المواصلات: {d2['transport_score']}%
+  - قوة السوق: {d2['market_strength_score']}%
+
+الفائز: {winner}
+"""
+                detected_nb = None  # عشان ما يعيد الكشف
 
         # كشف الفئة
         cat_keywords = {
@@ -442,7 +474,9 @@ def chat():
         # بناء context من البيانات الحقيقية
         forsati_context = ""
 
-        if detected_nb and detected_cat:
+        if len(detected_neighborhoods) >= 2 and is_compare:
+            pass  # تم بناء forsati_context أعلاه
+        elif detected_nb and detected_cat:
             result = calculate_score(detected_cat, detected_nb)
             if result:
                 d = result['details']

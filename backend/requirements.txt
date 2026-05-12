@@ -5,5 +5,5 @@ numpy
 scikit-learn
 xgboost
 gunicorn
-google-generativeai
+google-genai
 psycopg2-binary

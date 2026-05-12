@@ -17,7 +17,8 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 
 # ===== Gemini Chatbot Setup (NEW SDK) =====
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 print("KEY:", GEMINI_API_KEY[:10] if GEMINI_API_KEY else "NO KEY")
@@ -32,10 +33,9 @@ system_instruction = """أنت مساعد فرصتي، خبير بأحياء ا�
 
 # أنشئ العميل
 if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
-    gemini_model = genai.GenerativeModel('gemini-2.5-flash-preview-05-20')
+    client = genai.Client(api_key=GEMINI_API_KEY)
 else:
-    gemini_model = None
+    client = None
 
 # ===== اتصال قاعدة البيانات =====
 DATABASE_URL = os.environ.get('DATABASE_URL')
@@ -624,15 +624,21 @@ def chat():
 - إذا السؤال خارج نطاق أحياء الرياض، اعتذر بلطف
 - لا تخترع أرقاماً، استخدم البيانات الحقيقية فقط"""
  
-        response = gemini_model.generate_content(
-            f"{system_prompt}\n\nسؤال المستخدم: {question}"
-        )
- 
+        response = client.models.generate_content(
+            model='gemini-2.5-flash-preview-05-20',
+            contents=f"{system_prompt}\n\nسؤال المستخدم: {question}",
+            config=types.GenerateContentConfig(
+                temperature=0.7,
+                max_output_tokens=1000,
+    )
+)
         return jsonify({"answer": response.text, "sources": [detected_nb] if detected_nb else []})
- 
+    
     except Exception as e:
-        print(f"Gemini error: {e}")
-        return jsonify({"answer": "عذراً، حدث خطأ في خدمة المساعد. حاول مرة أخرى 😅"})
+        print("Gemini error:", e)
+        return jsonify({
+        "answer": "صار خطأ في المساعد الذكي 😅"
+        }), 500
     
 @app.route('/api/models', methods=['GET'])
 def list_models():

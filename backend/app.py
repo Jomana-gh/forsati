@@ -530,7 +530,7 @@ def chat():
     if not question:
         return jsonify({"answer": "الرجاء كتابة سؤال 😊"})
  
-    if not gemini_model:
+    if not client:
         return jsonify({"answer": "عذراً، خدمة المساعد غير متاحة حالياً 😅"})
  
     try:

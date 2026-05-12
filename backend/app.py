@@ -34,7 +34,7 @@ if GEMINI_API_KEY:
 عدد الأحياء: 60 حياً، عدد الفئات التجارية: 28 فئة."""
     
     gemini_model = genai.GenerativeModel(
-        model_name="gemini-2.0-flash-exp",
+        model_name="gemini-2.0-flash",
         generation_config=generation_config,
         system_instruction=system_instruction
     )

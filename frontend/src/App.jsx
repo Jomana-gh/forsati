@@ -53,7 +53,7 @@ const T = {
     reviewRole: "دورك (صاحب مطعم، مستثمر...)",
     reviewComment: "تجربتك مع فرصتي",
     reviewSubmit: "إرسال التقييم",
-    reviewSuccess: "شكراً! تم إرسال تقييمك ✅",
+    reviewSuccess: "شكراً! تم إرسال تقييمك ",
     faqBadge: "الأسئلة الشائعة",
     faqTitle: "هل لديك سؤال؟",
     contactBadge: "تواصل معنا",
@@ -72,9 +72,9 @@ const T = {
     statsActivities: "نوع نشاط",
     statsNeighborhoods: "حي في الرياض",
     statsCriteria: "معايير تقييم",
-    veryGood: "مناسب جداً ✅",
-    good: "مناسب 🟡",
-    bad: "غير مناسب ❌",
+    veryGood: "مناسب جداً ",
+    good: "مناسب ",
+    bad: "غير مناسب ",
     mlScore: "توقع النموذج",
     demandScore: "الطلب والكثافة السكانية",
     competitionScore: "مستوى المنافسة",
@@ -134,7 +134,7 @@ const T = {
     reviewRole: "Your Role (e.g. Restaurant Owner)",
     reviewComment: "Your experience with Forsati",
     reviewSubmit: "Submit Review",
-    reviewSuccess: "Thank you! Your review has been submitted ✅",
+    reviewSuccess: "Thank you! Your review has been submitted ",
     faqBadge: "FAQ",
     faqTitle: "Have a question?",
     contactBadge: "Contact Us",
@@ -153,9 +153,9 @@ const T = {
     statsActivities: "Business Types",
     statsNeighborhoods: "Neighborhoods",
     statsCriteria: "Rating Criteria",
-    veryGood: "Highly Suitable ✅",
-    good: "Suitable 🟡",
-    bad: "Not Suitable ❌",
+    veryGood: "Highly Suitable ",
+    good: "Suitable ",
+    bad: "Not Suitable ",
     mlScore: "Model Prediction",
     demandScore: "Population Density",
     competitionScore: "Competition Level",
@@ -655,7 +655,7 @@ const fetchReviews = async () => {
         <div className="detail-container">
           <h2 style={{ textAlign:"center", marginBottom:8 }}>{t.compareTitle}</h2>
           <p style={{ textAlign:"center", color:"#16a34a", fontWeight:700, marginBottom:24 }}>
-            🏆 {t.winner}: {getNeighborhoodLabel(winner.neighborhood, lang)} ({winner.final_score}/100)
+             {t.winner}: {getNeighborhoodLabel(winner.neighborhood, lang)} ({winner.final_score}/100)
           </p>
 
           {/* Header row */}
@@ -913,7 +913,7 @@ const fetchReviews = async () => {
           <div className="section-badge">{t.contactBadge}</div>
           <h2 className="section-title">{t.contactTitle}</h2>
           {contactSent ? (
-            <div className="contact-success"><span>✅</span><p>{t.successMsg}</p></div>
+            <div className="contact-success"><span></span><p>{t.successMsg}</p></div>
           ) : (
             <div className="contact-form">
               <div className="form-row">

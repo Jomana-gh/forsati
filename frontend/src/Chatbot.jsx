@@ -43,7 +43,7 @@ export default function Chatbot({ lang = "ar", t }) {
     setLoading(true);
 
     try {
-      // ✅ إرسال اللغة مع السؤال
+      //  إرسال اللغة مع السؤال
       const res = await axios.post(`${API}/api/chat`, { 
         question: question,
         lang: lang

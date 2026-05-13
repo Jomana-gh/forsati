@@ -68,7 +68,7 @@ function FlyTo({ position }) {
   return null;
 }
 
-export default function MapHeatView({ category, lang }) {  // ✅ استقبال lang
+export default function MapHeatView({ category, lang }) {  //  استقبال lang
   const [data, setData] = useState([]);
   const [selected, setSelected] = useState(null);
 
@@ -138,7 +138,7 @@ export default function MapHeatView({ category, lang }) {  // ✅ استقبال
             >
               <Popup>
                 <div dir={lang === "ar" ? "rtl" : "ltr"} style={{ textAlign: lang === "ar" ? "right" : "left" }}>
-                  {/* ✅ تعديل عرض اسم الحي */}
+                  {/*  تعديل عرض اسم الحي */}
                   <strong>{getNeighborhoodLabel(item.neighborhood, lang)}</strong>
                   <br />
                   {lang === "ar" ? "التقييم: " : "Score: "}{item.final_score}/100
@@ -203,7 +203,7 @@ export default function MapHeatView({ category, lang }) {  // ✅ استقبال
                 marginBottom: "6px"
               }}
             >
-              {/* ✅ تعديل عرض اسم الحي */}
+              {/*  تعديل عرض اسم الحي */}
               <strong>{i + 1}. {getNeighborhoodLabel(item.neighborhood, lang)}</strong>
               <span style={{ color: getColor(item.final_score) }}>
                 {item.final_score}

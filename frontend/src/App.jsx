@@ -19,7 +19,7 @@ const API = "https://forsati-api.onrender.com";
 const T = {
   ar: {
     dir: "rtl",
-    appName: "فرصتي",
+    appName: "ففرصتي",
     tagline: "اختر موقعك بثقة ... وابدأ استثمارك بذكاء",
     startNow: "ابدأ الآن",
     learnMore: "تعرف على المشروع",
@@ -513,7 +513,7 @@ const fetchReviews = async () => {
   const Header = ({ showBack=false }) => (
     <>
       <header className="header" dir={t.dir}>
-        <div className="header-logo" onClick={() => setPage("home")}>
+        <div className="header-logo" onClick={() => { setPage("home"); setMobileMenu(false); }}>
           <img src="/forsati_logo.png" alt="Forsati" className="header-logo-img" />
         </div>
         {showBack ? (
@@ -526,30 +526,30 @@ const fetchReviews = async () => {
         ) : (
           <div style={{ display:"flex", alignItems:"center", gap:16 }}>
             <nav className="nav">
-              <a href="#home-top" onClick={e=>{e.preventDefault();scrollTo("home-top");}}>{t.home}</a>
-              <a href="#about" onClick={e=>{e.preventDefault();scrollTo("about");}}>{t.about}</a>
-              <a href="#faq" onClick={e=>{e.preventDefault();scrollTo("faq");}}>{t.faq}</a>
-              <a href="#contact" onClick={e=>{e.preventDefault();scrollTo("contact");}}>{t.contact}</a>
+              <a href="#home-top" onClick={(e) => { e.preventDefault(); scrollTo("home-top"); }}>{t.home}</a>
+              <a href="#about" onClick={(e) => { e.preventDefault(); scrollTo("about"); }}>{t.about}</a>
+              <a href="#faq" onClick={(e) => { e.preventDefault(); scrollTo("faq"); }}>{t.faq}</a>
+              <a href="#contact" onClick={(e) => { e.preventDefault(); scrollTo("contact"); }}>{t.contact}</a>
             </nav>
             <button className="lang-toggle" onClick={() => setLang(lang==="ar"?"en":"ar")}>{lang==="ar"?"EN":"عر"}</button>
-            <button className="hamburger" onClick={() => setMenuOpen(o=>!o)}>
-              {menuOpen ? <X size={22} /> : <Menu size={22} />}
+            <button className="mobile-menu-btn" onClick={() => setMobileMenu(m => !m)}>
+              <Menu size={22} />
             </button>
           </div>
         )}
       </header>
-      {!showBack && (
-        <div className={`mobile-menu ${menuOpen?"open":""}`} dir={t.dir}>
-          <a href="#home-top" onClick={e=>{e.preventDefault();scrollTo("home-top");}}>{t.home}</a>
-          <a href="#about" onClick={e=>{e.preventDefault();scrollTo("about");}}>{t.about}</a>
-          <a href="#faq" onClick={e=>{e.preventDefault();scrollTo("faq");}}>{t.faq}</a>
-          <a href="#contact" onClick={e=>{e.preventDefault();scrollTo("contact");}}>{t.contact}</a>
+      {mobileMenu && !showBack && (
+        <div className="mobile-nav" dir={t.dir}>
+          <a onClick={() => { scrollTo("home-top"); setMobileMenu(false); }}>{t.home}</a>
+          <a onClick={() => { scrollTo("about"); setMobileMenu(false); }}>{t.about}</a>
+          <a onClick={() => { scrollTo("faq"); setMobileMenu(false); }}>{t.faq}</a>
+          <a onClick={() => { scrollTo("contact"); setMobileMenu(false); }}>{t.contact}</a>
         </div>
       )}
     </>
   );
 
-  // ===== Results Page =====
+
   if (page === "results") return (
     <div className="page" dir={t.dir}>
       <Header showBack />

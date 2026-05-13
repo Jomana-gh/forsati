@@ -376,6 +376,7 @@ export default function App() {
   const [reviews, setReviews]                   = useState([]);
   const [reviewsLoading, setReviewsLoading]     = useState(true);
   const [showReviewForm, setShowReviewForm] = useState(false);
+  const [mobileMenu, setMobileMenu] = useState(false);
   const detailRef = useRef(null);
 
   useEffect(() => {

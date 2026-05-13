@@ -293,7 +293,7 @@ function ReviewForm({ lang, t, onSubmitted }) {
 
   if (done) return (
     <div className="review-form-card" style={{ textAlign:"center", padding:"28px" }}>
-      <div style={{ fontSize:40 }}>🎉</div>
+      <div style={{ fontSize:40 }}> </div>
       <div style={{ fontSize:16, fontWeight:700, color:"#16a34a", marginTop:8 }}>{t.reviewSuccess}</div>
     </div>
   );

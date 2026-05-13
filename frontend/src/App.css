@@ -267,7 +267,7 @@ body {
   justify-content: center;
   align-items: center;
   gap: 12px;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   background: var(--green-light);
   padding: 20px;
   border-radius: 16px;
@@ -283,7 +283,7 @@ body {
   border-radius: 10px;
   padding: 0 12px;
   flex: 1;
-  min-width: 0;
+  min-width: 200px;
 }
 
 .select-icon { font-size: 16px; margin-left: 8px; }
@@ -883,7 +883,6 @@ body {
   .nav { gap: 14px; }
   .nav a { font-size: 13px; }
   .heatmap-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
-  .search-bar { flex-wrap: wrap !important; }
 }
 
 /* Map */
@@ -1112,11 +1111,7 @@ body {
   100% { transform: rotate(360deg); }
 }
 
-button svg, .mode-btn svg, .search-btn svg,
-.view-btn svg, .back-btn svg, .hero-btn svg {
-  vertical-align: middle;
-  position: relative;
-  top: -1px;
+button svg {
   margin-inline-end: 6px;
 }
 
@@ -1124,4 +1119,218 @@ svg.icon-fix {
   vertical-align: middle;
   margin-top: -2px;
   display: inline-block;
+}
+
+/* ===== Mobile Responsive Fixes ===== */
+
+/* ===== Hamburger Menu ===== */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  padding: 6px;
+  background: none;
+  border: none;
+}
+.hamburger span {
+  display: block;
+  width: 24px;
+  height: 2.5px;
+  background: var(--green);
+  border-radius: 2px;
+  transition: all 0.3s;
+}
+.mobile-menu {
+  display: none;
+  position: fixed;
+  top: 60px;
+  left: 0; right: 0;
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  padding: 16px 20px;
+  z-index: 999;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  flex-direction: column;
+  gap: 4px;
+}
+.mobile-menu.open { display: flex; }
+.mobile-menu a {
+  text-decoration: none;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  padding: 10px 12px;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+.mobile-menu a:hover { background: var(--green-light); color: var(--green); }
+
+/* ===== Reviews Slider ===== */
+.reviews-slider {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 8px 4px 16px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+.reviews-slider::-webkit-scrollbar { height: 5px; }
+.reviews-slider::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 99px; }
+.reviews-slider .review-card {
+  min-width: 280px;
+  scroll-snap-align: start;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+
+  /* Header */
+  .header { padding: 0 16px; height: 60px; }
+  .header-logo-img { height: 48px; }
+  .nav { display: none; }
+  .hamburger { display: flex; }
+
+  /* Hero */
+  .hero { padding: 32px 16px 28px; min-height: auto; }
+  .hero-logo-img { width: 120px; height: 120px; }
+  .hero-title { font-size: 34px; }
+  .hero-subtitle { font-size: 15px; margin-bottom: 20px; }
+  .hero-btns { flex-direction: column; gap: 10px; }
+  .hero-btn, .hero-btn-outline { width: 100%; padding: 12px 20px; }
+  .hero-stats { gap: 10px; margin-top: 24px; }
+  .stat-card { padding: 10px 16px; min-width: 80px; }
+  .stat-num { font-size: 22px; }
+  .stat-label { font-size: 11px; }
+
+  /* Search */
+  .search-section { padding: 28px 16px; }
+  .search-title { font-size: 17px; }
+  .mode-toggle { flex-direction: column; align-items: center; }
+  .mode-btn { width: 100%; max-width: 300px; }
+  .search-bar { padding: 14px; gap: 10px; }
+  .select-wrapper { min-width: unset; width: 100%; }
+  .search-btn { width: 100%; }
+
+  /* Categories */
+  .categories-section { padding: 28px 16px; }
+  .categories-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .category-card { padding: 14px 8px; font-size: 12px; }
+
+  /* About */
+  .about-section { padding: 40px 16px; }
+  .about-features { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .feature-card { padding: 18px 12px; }
+
+  /* Reviews — slider أفقي بالجوال */
+  .reviews-section { padding: 40px 16px; }
+  .reviews-grid { display: none; } /* نخفي الـ grid */
+  .reviews-slider { display: flex; } /* ونظهر الـ slider */
+
+  /* FAQ */
+  .faq-section { padding: 40px 16px; }
+
+  /* Contact */
+  .contact-section { padding: 40px 16px; }
+  .form-row { grid-template-columns: 1fr; }
+
+  /* Results */
+  .results-container { padding: 16px; }
+  .results-title { font-size: 18px; }
+  .view-btn { padding: 8px 14px; font-size: 13px; }
+  .result-card { padding: 14px 16px; gap: 12px; }
+  .neighborhood-name { font-size: 15px; }
+
+  /* الخريطة والقائمة فوق بعض */
+  div[style*="display: flex"][style*="gap: 16px"] {
+    flex-direction: column !important;
+    height: auto !important;
+  }
+
+  /* Detail */
+  .detail-container { padding: 16px; }
+  .detail-hero { padding: 24px 16px; }
+  .detail-hero h2 { font-size: 24px; }
+  .big-score { font-size: 52px; }
+  .big-label { font-size: 16px; }
+  .breakdown-row { flex-wrap: wrap; }
+  .breakdown-label { min-width: unset; width: 100%; font-size: 13px; }
+
+  /* Footer */
+  .footer { padding: 32px 16px 0; }
+  .footer-inner { grid-template-columns: 1fr; gap: 24px; }
+}
+
+/* الـ slider مخفي على الديسكتوب */
+@media (min-width: 769px) {
+  .reviews-slider { display: none; }
+  .reviews-grid { display: grid; }
+}
+
+/* ===== Review Form Styles ===== */
+.review-form-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  margin-top: 24px;
+}
+.review-form-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+.review-form-sub { font-size: 14px; color: var(--gray); margin-bottom: 20px; }
+
+.review-accurate-btns { display: flex; gap: 10px; margin-bottom: 18px; }
+.accurate-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: 2px solid var(--border);
+  background: #fff;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.accurate-btn.yes.active { background: #dcfce7; border-color: #16a34a; color: #16a34a; }
+.accurate-btn.no.active  { background: #fee2e2; border-color: #dc2626; color: #dc2626; }
+
+.review-field { margin-bottom: 14px; }
+.review-label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+.review-input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.review-input:focus { border-color: var(--green); }
+
+.review-submit-btn {
+  width: 100%;
+  background: var(--green);
+  color: #fff;
+  border: none;
+  padding: 13px;
+  border-radius: 10px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+.review-submit-btn:hover:not(:disabled) { background: var(--green-dark); transform: translateY(-1px); }
+.review-submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+@media (max-width: 768px) {
+  .review-accurate-btns { flex-direction: column; }
+  .review-form-card { padding: 20px 16px; }
+}
+
+.write-review-trigger:hover {
+  background: #f0fdf4;
+  border-color: #16a34a;
+  transform: scale(1.02);
 }

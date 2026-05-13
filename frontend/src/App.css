@@ -1378,3 +1378,78 @@ svg.icon-fix {
   .header { padding: 0 16px; height: 60px; }
   .header-logo-img { height: 32px; }
 }
+
+/* ===== Mobile Header Fix ===== */
+
+.mobile-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--green);
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+
+  .header {
+    padding: 0 16px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+  }
+
+  .header-logo {
+    flex-shrink: 0;
+  }
+
+  .header-logo-img {
+    height: 40px;
+  }
+
+  /* الجزء اليمين */
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+  }
+
+  .mobile-menu-btn {
+    display: flex;
+  }
+
+  .nav {
+    display: none !important;
+  }
+
+  .lang-toggle {
+    margin: 0;
+    padding: 6px 14px;
+    white-space: nowrap;
+  }
+}
+
+button svg,
+.view-btn svg,
+.search-btn svg,
+.breakdown-label svg {
+  vertical-align: middle;
+  position: relative;
+  top: -1px;
+  flex-shrink: 0;
+}
+
+.view-btn,
+.search-btn,
+.breakdown-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}

@@ -19,7 +19,7 @@ const API = "https://forsati-api.onrender.com";
 const T = {
   ar: {
     dir: "rtl",
-    appName: "ففرصتي",
+    appName: "فرصتي",
     tagline: "اختر موقعك بثقة ... وابدأ استثمارك بذكاء",
     startNow: "ابدأ الآن",
     learnMore: "تعرف على المشروع",

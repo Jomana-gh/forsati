@@ -517,14 +517,14 @@ const fetchReviews = async () => {
           <img src="/forsati_logo.png" alt="Forsati" className="header-logo-img" />
         </div>
         {showBack ? (
-          <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:12 }}>
             <button className="lang-toggle" onClick={() => setLang(lang==="ar"?"en":"ar")}>{lang==="ar"?"EN":"عر"}</button>
-            <button className="back-btn" style={{ display:"flex", alignItems:"center", gap:4 }} onClick={() => setPage(results.length&&page==="detail"?"results":"home")}>
+            <button className="back-btn" onClick={() => setPage(results.length&&page==="detail"?"results":"home")}>
               <ArrowLeft size={16} /> {t.back}
             </button>
           </div>
         ) : (
-          <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:16 }}>
             <nav className="nav">
               <a href="#home-top" onClick={e=>{e.preventDefault();scrollTo("home-top");}}>{t.home}</a>
               <a href="#about" onClick={e=>{e.preventDefault();scrollTo("about");}}>{t.about}</a>
@@ -532,7 +532,7 @@ const fetchReviews = async () => {
               <a href="#contact" onClick={e=>{e.preventDefault();scrollTo("contact");}}>{t.contact}</a>
             </nav>
             <button className="lang-toggle" onClick={() => setLang(lang==="ar"?"en":"ar")}>{lang==="ar"?"EN":"عر"}</button>
-            <button className="hamburger" onClick={() => setMenuOpen(o=>!o)} style={{ display:"none" }}>
+            <button className="hamburger" onClick={() => setMenuOpen(o=>!o)}>
               {menuOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
@@ -739,7 +739,7 @@ const fetchReviews = async () => {
             <GitCompare size={14} style={{ marginLeft:4 }} /> {t.compareNeighborhoods}
           </button>
         </div>
-        <div className="search-bar" style={{ flexWrap: searchMode === "compare" ? "wrap" : "nowrap" }}>
+        <div className="search-bar">
           <div className="select-wrapper">
             <span className="select-icon"><List size={16}/></span>
             <select value={selectedCategory} onChange={e=>setSelectedCategory(e.target.value)} className="select-input">

@@ -420,7 +420,7 @@ ranking = rank_neighborhoods(df, model, feature_cols, 'restaurant', 8)
 ranking = rank_neighborhoods(df, model, feature_cols, 'cafe', 8)
 
 
-"""import pickle
+import pickle
 
 saved = {
     'model': model,
@@ -430,4 +430,4 @@ saved = {
 with open('forsati_model_v2.pkl', 'wb') as f:
     pickle.dump(saved, f)
 
-print(' تم حفظ النموذج الجديد: forsati_model_v.pkl')"""
+print(' تم حفظ النموذج الجديد: forsati_model_v.pk2')
